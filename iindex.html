@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CraveCart | Food Delivery</title>
+<link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#101010;--card:#1b1b1b;--text:#fff;--muted:#aaa;--orange:#ff6b25}
+body{font-family:Poppins,sans-serif;background:var(--bg);color:var(--text)}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 8%;border-bottom:1px solid #292929}
+.logo{font-size:26px;font-weight:800;color:var(--orange)}
+.logo span{color:white}
+nav{display:flex;gap:22px;align-items:center}
+a{color:var(--text);text-decoration:none}
+button{cursor:pointer;border:0;font-family:inherit}
+.btn{background:var(--orange);color:white;padding:11px 18px;border-radius:10px;font-weight:600}
+.hero{padding:70px 8%;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.hero h1{font-size:clamp(35px,5vw,62px);line-height:1.15;margin:15px 0}
+.hero h1 span{color:var(--orange)}
+.hero p{color:var(--muted);max-width:470px;line-height:1.8;margin-bottom:24px}
+.hero img{width:min(42%,400px);border-radius:50%;filter:drop-shadow(0 0 35px #ff6b2533)}
+.tag{color:var(--orange);font-weight:700;letter-spacing:2px}
+section{padding:35px 8%}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:25px}
+h2{font-size:28px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.filters button{padding:9px 16px;border-radius:30px;background:#242424;color:#ddd}
+.filters button.active,.filters button:hover{background:var(--orange);color:white}
+input,select{padding:12px;border:1px solid #393939;border-radius:10px;background:#202020;color:white;font:inherit;max-width:100%}
+#search{width:100%;margin-bottom:20px}
+.menu{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.food{background:var(--card);border:1px solid #292929;border-radius:16px;overflow:hidden;transition:.25s}
+.food:hover{transform:translateY(-5px);border-color:var(--orange)}
+.food img{width:100%;height:170px;object-fit:cover;background:#292929}
+.food-info{padding:16px}
+.food h3{font-size:17px;margin-bottom:8px}
+.food p{font-size:12px;color:var(--muted);min-height:36px;margin-bottom:12px}
+.price{color:var(--orange);font-weight:700;font-size:19px}
+.food-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.add{background:var(--orange);color:white;padding:9px 13px;border-radius:8px}
+.cart-box{background:var(--card);border:1px solid #333;border-radius:16px;padding:22px}
+.cart-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #333}
+.cart-item small{display:block;color:var(--muted)}
+.qty{display:flex;align-items:center;gap:9px}
+.qty button{background:#333;color:white;width:27px;height:27px;border-radius:7px}
+.total{display:flex;justify-content:space-between;font-size:22px;font-weight:700;margin:20px 0}
+.empty{color:var(--muted);padding:15px 0}
+footer{text-align:center;padding:30px;color:var(--muted);border-top:1px solid #292929}
+#notice{position:fixed;bottom:20px;right:20px;background:var(--orange);padding:14px 20px;border-radius:10px;display:none;z-index:10}
+@media(max-width:1000px){.menu{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ header{padding:18px 5%}nav{gap:12px}nav a{font-size:13px}
+ .hero{padding:45px 6%;flex-direction:column;text-align:center}
+ .hero img{width:75%;max-width:280px}.hero p{margin:0 auto 20px}
+ section{padding:28px 5%}.menu{gap:12px}
+ .food img{height:125px}.food-info{padding:11px}
+ .food h3{font-size:14px}.food p{font-size:11px}
+ .price{font-size:16px}.add{padding:8px}
+ h2{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">Crave<span>Cart.</span></div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#menu">Menu</a>
+    <a href="#cart">🛒 Cart (<span id="count">0</span>)</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <div>
+    <div class="tag">GOOD FOOD. GOOD MOOD.</div>
+    <h1>Cravings meet<br><span>their match.</span></h1>
+    <p>Delicious food, incredible flavours and your favourites all in one place. Pick your meal and enjoy!</p>
+    <a class="btn" href="#menu">Explore Menu →</a>
+  </div>
+  <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80" alt="Delicious burger">
+</section>
+
+<section id="menu">
+  <div class="section-head">
+    <h2>Explore Menu 🍴</h2>
+    <span id="result">8 dishes</span>
+  </div>
+  <input id="search" type="search" placeholder="🔍 Search burgers, pizza, drinks..." aria-label="Search food">
+  <div class="filters" id="filters"></div>
+  <div class="menu" id="menuItems"></div>
+</section>
+
+<section id="cart">
+  <div class="section-head"><h2>Your Cart 🛒</h2></div>
+  <div class="cart-box">
+    <div id="cartItems"><p class="empty">Your cart is empty. Add something delicious!</p></div>
+    <div class="total"><span>Total</span><span id="total">₹0</span></div>
+    <button class="btn" onclick="checkout()">Checkout →</button>
+    <button class="btn" style="background:#333;margin-left:8px" onclick="clearCart()">Clear Cart</button>
+  </div>
+</section>
+</main>
+
+<footer>© <span id="year"></span> CraveCart · Made with ❤️ for food lovers</footer>
+<div id="notice" role="status"></div>
+
+<script>
+const foods=[
+ {id:1,name:"Classic Burger",cat:"Burgers",price:189,img:"photo-1568901346375-23c9450c58cd",desc:"Juicy burger with signature sauce."},
+ {id:2,name:"Cheese Pizza",cat:"Pizza",price:279,img:"photo- pizza",desc:"Cheesy, crispy and full of flavour."},
+ {id:3,name:"Golden Fries",cat:"Sides",price:99,img:"photo-1573080496219-bb080dd4f877",desc:"Crispy fries with house seasoning."},
+ {id:4,name:"Creamy Pasta",cat:"Pasta",price:219,img:"photo-1473093295043-cdd812d0e601",desc:"Creamy sauce and Italian herbs."},
+ {id:5,name:"Paneer Wrap",cat:"Wraps",price:159,img:"photo-1626700051175-6818013e1d4f",desc:"Spiced paneer in a toasted wrap."},
+ {id:6,name:"Chicken Bites",cat:"Chicken",price:229,img:"photo-1608039829572-78524f79c4c7",desc:"Crispy bites with spicy sauce."},
+ {id:7,name:"Lava Cake",cat:"Desserts",price:129,img:"photo-1606313564200-e75d5e30476c",desc:"Warm chocolate with a soft centre."},
+ {id:8,name:"Mango Shake",cat:"Drinks",price:119,img:"photo-1572490122747-3968b75cc699",desc:"Refreshing creamy mango shake."}
+];
+
+// Correct image IDs and image URLs are set here.
+const imageIDs={
+ 1:"photo-1568901346375-23c9450c58cd",
+ 2:"photo-1579751626657-72bc17010498",
+ 3:"photo-1573080496219-bb080dd4f877",
+ 4:"photo-1473093295043-cdd812d0e601",
+ 5:"photo-1626700051175-6818013e1d4f",
+ 6:"photo-1608039829572-78524f79c4c7",
+ 7:"photo-1606313564200-e75d5e30476c",
+ 8:"photo-1572490122747-3968b75cc699"
+};
+
+let cart=JSON.parse(localStorage.getItem("cc-cart")||"[]");
+let category="All",query="";
+
+const money=n=>"₹"+n.toLocaleString("en-IN");
+const save=()=>localStorage.setItem("cc-cart",JSON.stringify(cart));
+
+function renderFilters(){
+ const cats=["All",...new Set(foods.map(f=>f.cat))];
+ document.getElementById("filters").innerHTML=cats.map(c=>
+ `<button class="${category===c?"active":""}" onclick="setCategory('${c}')">${c}</button>`
+ ).join("");
+}
+
+function setCategory(c){category=c;renderFilters();renderFoods()}
+
+function renderFoods(){
+ const list=foods.filter(f=>
+ (category==="All"||f.cat===category)&&
+ (f.name+" "+f.cat+" "+f.desc).toLowerCase().includes(query.toLowerCase())
+ );
+ document.getElementById("result").textContent=list.length+" dishes";
+ document.getElementById("menuItems").innerHTML=list.length?list.map(f=>`
+ <article class="food">
+ <img loading="lazy" src="https://images.unsplash.com/${imageIDs[f.id]}?auto=format&fit=crop&w=600&q=80" alt="${f.name}">
+ <div class="food-info">
+ <h3>${f.name}</h3><p>${f.desc}</p>
+ <div class="food-bottom"><span class="price">${money(f.price)}</span>
+ <button class="add" onclick="add(${f.id})">＋ Add</button></div>
+ </div></article>`).join(""):`<p class="empty">No dishes found. Try another search.</p>`;
+}
+
+function add(id){
+ const item=cart.find(i=>i.id===id);
+ if(item)item.qty++;
+ else cart.push({id,qty:1});
+ save();renderCart();toast("Added to cart!");
+}
+
+function change(id,amount){
+ const item=cart.find(i=>i.id===id);
+ if(!item)return;
+ item.qty+=amount;
+ cart=cart.filter(i=>i.qty>0);
+ save();renderCart();
+}
+
+function clearCart(){
+ cart=[];save();renderCart();toast("Cart cleared");
+}
+
+function renderCart(){
+ const box=document.getElementById("cartItems");
+ const count=cart.reduce((sum,i)=>sum+i.qty,0);
+ const total=cart.reduce((sum,i)=>sum+foods.find(f=>f.id===i.id).price*i.qty,0);
+ document.getElementById("count").textContent=count;
+ document.getElementById("total").textContent=money(total);
+ box.innerHTML=cart.length?cart.map(i=>{
+ const f=foods.find(x=>x.id===i.id);
+ return `<div class="cart-item"><div><strong>${f.name}</strong>
+ <small>${money(f.price)} each</small></div>
+ <div class="qty"><button onclick="change(${i.id},-1)">−</button>
+ <span>${i.qty}</span><button onclick="change(${i.id},1)">+</button></div>
+ <strong>${money(f.price*i.qty)}</strong></div>`;
+ }).join(""):`<p class="empty">Your cart is empty. Add something delicious!</p>`;
+}
+
+function checkout(){
+ if(!cart.length){toast("Your cart is empty!");return}
+ const total=cart.reduce((s,i)=>s+foods.find(f=>f.id===i.id).price*i.qty,0);
+ if(confirm("Place demo order for "+money(total)+"? No payment will be collected.")){
+ cart=[];save();renderCart();toast("Demo order placed successfully!");
+ }
+}
+
+let timer;
+function toast(message){
+ const box=document.getElementById("notice");
+ box.textContent=message;box.style.display="block";
+ clearTimeout(timer);timer=setTimeout(()=>box.style.display="none",2500);
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+ query=e.target.value;renderFoods();
+});
+document.getElementById("year").textContent=new Date().getFullYear();
+
+renderFilters();
+renderFoods();
+renderCart();
+</script>
+</body>
+</html>
