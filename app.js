@@ -1,72 +1,78 @@
+```javascript
 /* =========================================================
-   CRAVECART — PREMIUM FOOD ORDERING WEBSITE
+   CRAVECART PREMIUM FOOD ORDERING WEBSITE
    File: app.js
-   HTML: index.html
-   CSS: style.css
-   Admin demo password: cravecart100
-   ========================================================= */
+   Features:
+   - 100+ vegetarian food products
+   - Category filtering and search
+   - Product sorting
+   - Shopping cart
+   - Wishlist / favourites
+   - Quantity management
+   - Coupon system
+   - Delivery charges and tax calculation
+   - Checkout form
+   - Invoice generation, print and download
+   - LocalStorage persistence
+   - Product quick view
+   - Toast notifications
+   - Newsletter demo
+   - Admin panel support
+========================================================= */
 
 "use strict";
 
-/* =========================
+/* =========================================================
    1. CONFIGURATION
-========================= */
+========================================================= */
 
-const CONFIG = {
-    brand: "CraveCart",
-    adminPassword: "cravecart100",
+const CC = {
     currency: "INR",
-    currencySymbol: "₹",
-    deliveryFee: 35,
-    freeDeliveryAbove: 499,
+    locale: "en-IN",
     taxRate: 0.05,
-    storagePrefix: "cravecart_"
+    deliveryFee: 39,
+    freeDeliveryMinimum: 499,
+    minimumOrder: 99,
+    storage: {
+        cart: "cravecart_cart",
+        wishlist: "cravecart_wishlist",
+        orders: "cravecart_orders",
+        products: "cravecart_products",
+        coupon: "cravecart_coupon",
+        lastOrder: "cravecart_last_order"
+    }
 };
 
-const STORAGE_KEYS = {
-    cart: CONFIG.storagePrefix + "cart",
-    wishlist: CONFIG.storagePrefix + "wishlist",
-    orders: CONFIG.storagePrefix + "orders",
-    products: CONFIG.storagePrefix + "products",
-    coupon: CONFIG.storagePrefix + "coupon"
-};
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-
-/* =========================
-   2. HELPER FUNCTIONS
-========================= */
-
-const $ = (selector, parent = document) =>
-    parent.querySelector(selector);
-
-const $$ = (selector, parent = document) =>
-    [...parent.querySelectorAll(selector)];
-
-function loadStorage(key, fallback) {
+function readStorage(key, fallback) {
     try {
         const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : fallback;
+        return value === null ? fallback : JSON.parse(value);
     } catch (error) {
-        console.warn("Storage read error:", error);
+        console.warn("Storage read error:", key, error);
         return fallback;
     }
 }
 
-function saveStorage(key, value) {
+function writeStorage(key, value) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
+        return true;
     } catch (error) {
-        console.warn("Storage save error:", error);
+        console.warn("Storage write error:", key, error);
         showToast("Browser storage unavailable.", "error");
+        return false;
     }
 }
 
-function formatPrice(amount) {
-    return new Intl.NumberFormat("en-IN", {
+function money(value) {
+    return new Intl.NumberFormat(CC.locale, {
         style: "currency",
-        currency: CONFIG.currency,
-        maximumFractionDigits: 0
-    }).format(Number(amount) || 0);
+        currency: CC.currency,
+        maximumFractionDigits: 2
+    }).format(Number(value) || 0);
 }
 
 function escapeHTML(value) {
@@ -75,1557 +81,1398 @@ function escapeHTML(value) {
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
-        "'": "&#39;"
+        "'": "&#039;"
     })[character]);
 }
 
-function createId(prefix = "CC") {
-    return prefix + "-" +
-        Date.now().toString(36).toUpperCase() +
+function makeId(prefix = "CC") {
+    return prefix + "-" + Date.now().toString(36).toUpperCase() +
         "-" + Math.random().toString(36).slice(2, 7).toUpperCase();
 }
 
-function showToast(message, type = "success") {
-    let toast = $("#cc-toast");
+function getImage(name, category) {
+    const images = {
+        "Pizza": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=85",
+        "Burger": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=85",
+        "Biryani": "https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=800&q=85",
+        "Indian": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=85",
+        "Chinese": "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=85",
+        "Dessert": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=85",
+        "Drinks": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=85",
+        "Snacks": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=85",
+        "South Indian": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=85",
+        "Rolls": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=85"
+    };
 
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "cc-toast";
-        toast.setAttribute("role", "status");
+    const key = Object.keys(images).find(item =>
+        String(category).toLowerCase().includes(item.toLowerCase())
+    );
 
-        Object.assign(toast.style, {
-            position: "fixed",
-            right: "20px",
-            bottom: "20px",
-            zIndex: "99999",
-            maxWidth: "calc(100vw - 40px)",
-            padding: "14px 20px",
-            borderRadius: "14px",
-            color: "#fff",
-            background: "#171717",
-            boxShadow: "0 10px 35px rgba(0,0,0,.3)",
-            fontSize: "14px",
-            opacity: "0",
-            transform: "translateY(12px)",
-            transition: "all .25s ease"
-        });
-
-        document.body.appendChild(toast);
-    }
-
-    toast.textContent = message;
-    toast.style.borderLeft =
-        type === "error" ? "4px solid #ff4040" :
-        type === "warning" ? "4px solid #ffc107" :
-        "4px solid #ff6b00";
-
-    toast.style.opacity = "1";
-    toast.style.transform = "translateY(0)";
-
-    clearTimeout(showToast.timer);
-
-    showToast.timer = setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(12px)";
-    }, 2800);
+    return images[key] || images[name] ||
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=85";
 }
 
+/* =========================================================
+   2. PRODUCT DATABASE
+========================================================= */
 
-/* =========================
-   3. PRODUCT DATABASE
-========================= */
-
-const DEFAULT_PRODUCTS = [
+const starterProducts = [
     {
-        id: 1,
-        name: "Classic Margherita Pizza",
-        category: "Pizza",
-        price: 249,
-        oldPrice: 299,
-        rating: 4.8,
-        reviews: 124,
-        badge: "Bestseller",
-        veg: true,
-        time: "20–25 min",
-        description: "Mozzarella, fresh basil and our signature tomato sauce.",
-        image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=85"
+        id: 1, name: "Margherita Pizza", category: "Pizza",
+        price: 199, oldPrice: 249, rating: 4.8,
+        description: "Classic pizza with mozzarella, tomato sauce and fresh basil.",
+        image: "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=800&q=85",
+        badge: "Bestseller", veg: true
     },
     {
-        id: 2,
-        name: "Farmhouse Pizza",
-        category: "Pizza",
-        price: 329,
-        oldPrice: 379,
-        rating: 4.7,
-        reviews: 98,
-        badge: "Popular",
-        veg: true,
-        time: "25–30 min",
-        description: "Loaded with capsicum, onion, mushroom and cheese.",
-        image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=900&q=85"
+        id: 2, name: "Farmhouse Pizza", category: "Pizza",
+        price: 299, oldPrice: 349, rating: 4.7,
+        description: "Loaded with capsicum, onion, mushroom and golden cheese.",
+        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=85",
+        badge: "Popular", veg: true
     },
     {
-        id: 3,
-        name: "Paneer Tikka Pizza",
-        category: "Pizza",
-        price: 349,
-        oldPrice: 399,
-        rating: 4.9,
-        reviews: 112,
-        badge: "Chef's Pick",
-        veg: true,
-        time: "25–30 min",
-        description: "Smoky paneer tikka with creamy cheese and herbs.",
-        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=85"
+        id: 3, name: "Paneer Tikka Pizza", category: "Pizza",
+        price: 329, oldPrice: 379, rating: 4.9,
+        description: "Indian-style pizza topped with spicy paneer tikka.",
+        badge: "Chef's Pick", veg: true
     },
     {
-        id: 4,
-        name: "Classic Veg Burger",
-        category: "Burgers",
-        price: 149,
-        oldPrice: 179,
-        rating: 4.6,
-        reviews: 86,
-        badge: "",
-        veg: true,
-        time: "15–20 min",
-        description: "Crispy vegetable patty, lettuce and house sauce.",
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85"
+        id: 4, name: "Veggie Supreme Pizza", category: "Pizza",
+        price: 349, oldPrice: 399, rating: 4.6,
+        description: "A colourful mix of fresh vegetables and cheese.",
+        veg: true
     },
     {
-        id: 5,
-        name: "Double Cheese Burger",
-        category: "Burgers",
-        price: 199,
-        oldPrice: 229,
-        rating: 4.8,
-        reviews: 105,
-        badge: "Popular",
-        veg: true,
-        time: "15–20 min",
-        description: "Double cheese, crunchy vegetables and creamy sauce.",
-        image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=85"
+        id: 5, name: "Classic Veg Burger", category: "Burger",
+        price: 129, oldPrice: 159, rating: 4.5,
+        description: "Crispy vegetable patty with lettuce and signature sauce.",
+        badge: "Popular", veg: true
     },
     {
-        id: 6,
-        name: "Crispy Veg Wrap",
-        category: "Wraps",
-        price: 129,
-        oldPrice: 159,
-        rating: 4.5,
-        reviews: 57,
-        badge: "",
-        veg: true,
-        time: "15 min",
-        description: "Crispy veggies wrapped with fresh salad and sauce.",
-        image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=85"
+        id: 6, name: "Cheese Blast Burger", category: "Burger",
+        price: 179, oldPrice: 219, rating: 4.8,
+        description: "A delicious burger packed with molten cheese.",
+        veg: true
     },
     {
-        id: 7,
-        name: "Paneer Tikka Wrap",
-        category: "Wraps",
-        price: 179,
-        oldPrice: 209,
-        rating: 4.8,
-        reviews: 77,
-        badge: "Bestseller",
-        veg: true,
-        time: "15–20 min",
-        description: "Spiced paneer, crunchy salad and mint dressing.",
-        image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=900&q=85"
+        id: 7, name: "Paneer Crunch Burger", category: "Burger",
+        price: 199, oldPrice: 249, rating: 4.7,
+        description: "Crispy paneer patty with creamy spicy mayo.",
+        veg: true
     },
     {
-        id: 8,
-        name: "Creamy White Pasta",
-        category: "Pasta",
-        price: 229,
-        oldPrice: 259,
-        rating: 4.7,
-        reviews: 89,
-        badge: "",
-        veg: true,
-        time: "20 min",
-        description: "Creamy white sauce pasta with herbs and parmesan.",
-        image: "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?auto=format&fit=crop&w=900&q=85"
+        id: 8, name: "Aloo Tikki Burger", category: "Burger",
+        price: 99, oldPrice: 129, rating: 4.4,
+        description: "Golden potato tikki with tangy Indian sauces.",
+        veg: true
     },
     {
-        id: 9,
-        name: "Spicy Red Sauce Pasta",
-        category: "Pasta",
-        price: 219,
-        oldPrice: 249,
-        rating: 4.6,
-        reviews: 62,
-        badge: "",
-        veg: true,
-        time: "20 min",
-        description: "Pasta tossed in rich tomato and chilli sauce.",
-        image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=85"
+        id: 9, name: "Veg Dum Biryani", category: "Biryani",
+        price: 189, oldPrice: 229, rating: 4.8,
+        description: "Fragrant basmati rice cooked with vegetables and spices.",
+        badge: "Bestseller", veg: true
     },
     {
-        id: 10,
-        name: "Paneer Butter Masala",
-        category: "Indian",
-        price: 279,
-        oldPrice: 319,
-        rating: 4.9,
-        reviews: 143,
-        badge: "Bestseller",
-        veg: true,
-        time: "25 min",
-        description: "Soft paneer in a rich buttery tomato gravy.",
-        image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=900&q=85"
+        id: 10, name: "Paneer Biryani", category: "Biryani",
+        price: 229, oldPrice: 279, rating: 4.9,
+        description: "Aromatic rice with marinated paneer and herbs.",
+        veg: true
     },
     {
-        id: 11,
-        name: "Dal Makhani",
-        category: "Indian",
-        price: 229,
-        oldPrice: 259,
-        rating: 4.8,
-        reviews: 93,
-        badge: "",
-        veg: true,
-        time: "25 min",
-        description: "Slow-cooked black lentils with butter and spices.",
-        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=900&q=85"
+        id: 11, name: "Hyderabadi Veg Biryani", category: "Biryani",
+        price: 219, oldPrice: 259, rating: 4.7,
+        description: "Traditional-style dum biryani with fragrant spices.",
+        veg: true
     },
     {
-        id: 12,
-        name: "Veg Biryani",
-        category: "Indian",
-        price: 199,
-        oldPrice: 239,
-        rating: 4.7,
-        reviews: 117,
-        badge: "Popular",
-        veg: true,
-        time: "20–25 min",
-        description: "Fragrant basmati rice with vegetables and spices.",
-        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=900&q=85"
+        id: 12, name: "Paneer Butter Masala", category: "Indian",
+        price: 249, oldPrice: 299, rating: 4.9,
+        description: "Soft paneer in a rich, creamy tomato gravy.",
+        badge: "Chef's Pick", veg: true
     },
     {
-        id: 13,
-        name: "Hakka Noodles",
-        category: "Chinese",
-        price: 179,
-        oldPrice: 209,
-        rating: 4.5,
-        reviews: 74,
-        badge: "",
-        veg: true,
-        time: "15–20 min",
+        id: 13, name: "Dal Makhani", category: "Indian",
+        price: 199, oldPrice: 239, rating: 4.8,
+        description: "Slow-cooked black lentils with buttery cream.",
+        veg: true
+    },
+    {
+        id: 14, name: "Shahi Paneer", category: "Indian",
+        price: 259, oldPrice: 309, rating: 4.7,
+        description: "Paneer in a smooth royal cashew and tomato gravy.",
+        veg: true
+    },
+    {
+        id: 15, name: "Chole Bhature", category: "Indian",
+        price: 149, oldPrice: 179, rating: 4.6,
+        description: "Spiced chickpeas served with fluffy fried bhature.",
+        veg: true
+    },
+    {
+        id: 16, name: "Veg Hakka Noodles", category: "Chinese",
+        price: 159, oldPrice: 199, rating: 4.5,
         description: "Wok-tossed noodles with crunchy vegetables.",
-        image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=900&q=85"
+        veg: true
     },
     {
-        id: 14,
-        name: "Veg Manchurian",
-        category: "Chinese",
-        price: 189,
-        oldPrice: 219,
-        rating: 4.6,
-        reviews: 68,
-        badge: "",
-        veg: true,
-        time: "20 min",
-        description: "Crispy vegetable balls in a savoury Indo-Chinese sauce.",
-        image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=85"
+        id: 17, name: "Veg Manchurian", category: "Chinese",
+        price: 169, oldPrice: 209, rating: 4.6,
+        description: "Vegetable dumplings tossed in tangy Manchurian sauce.",
+        veg: true
     },
     {
-        id: 15,
-        name: "Chocolate Brownie",
-        category: "Desserts",
-        price: 119,
-        oldPrice: 149,
-        rating: 4.9,
-        reviews: 132,
-        badge: "Sweet Pick",
-        veg: true,
-        time: "10 min",
-        description: "Rich chocolate brownie with a soft centre.",
-        image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=85"
+        id: 18, name: "Chilli Paneer", category: "Chinese",
+        price: 219, oldPrice: 259, rating: 4.8,
+        description: "Paneer cubes tossed with peppers and spicy sauce.",
+        veg: true
     },
     {
-        id: 16,
-        name: "Chocolate Cake",
-        category: "Desserts",
-        price: 159,
-        oldPrice: 189,
-        rating: 4.8,
-        reviews: 88,
-        badge: "",
-        veg: true,
-        time: "10–15 min",
-        description: "Decadent chocolate cake layered with chocolate cream.",
-        image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85"
+        id: 19, name: "Chocolate Brownie", category: "Dessert",
+        price: 99, oldPrice: 129, rating: 4.7,
+        description: "Rich chocolate brownie with a fudgy centre.",
+        veg: true
     },
     {
-        id: 17,
-        name: "Fresh Lime Soda",
-        category: "Drinks",
-        price: 69,
-        oldPrice: 89,
-        rating: 4.5,
-        reviews: 46,
-        badge: "",
-        veg: true,
-        time: "5 min",
-        description: "Refreshing lime soda served chilled.",
-        image: "https://images.unsplash.com/photo-1513558161293-cdaf765edfd7?auto=format&fit=crop&w=900&q=85"
+        id: 20, name: "Chocolate Lava Cake", category: "Dessert",
+        price: 129, oldPrice: 159, rating: 4.9,
+        description: "Warm chocolate cake with a molten centre.",
+        badge: "Bestseller", veg: true
     },
     {
-        id: 18,
-        name: "Cold Coffee",
-        category: "Drinks",
-        price: 109,
-        oldPrice: 129,
-        rating: 4.7,
-        reviews: 71,
-        badge: "Popular",
-        veg: true,
-        time: "5–10 min",
-        description: "Chilled coffee blended with milk and ice cream.",
-        image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=85"
+        id: 21, name: "Gulab Jamun", category: "Dessert",
+        price: 79, oldPrice: 99, rating: 4.6,
+        description: "Soft milk dumplings soaked in fragrant sugar syrup.",
+        veg: true
+    },
+    {
+        id: 22, name: "Cold Coffee", category: "Drinks",
+        price: 99, oldPrice: 129, rating: 4.5,
+        description: "Chilled creamy coffee served over ice.",
+        veg: true
+    },
+    {
+        id: 23, name: "Mango Smoothie", category: "Drinks",
+        price: 119, oldPrice: 149, rating: 4.7,
+        description: "Refreshing mango smoothie made with ripe mangoes.",
+        veg: true
+    },
+    {
+        id: 24, name: "Fresh Lime Soda", category: "Drinks",
+        price: 59, oldPrice: 79, rating: 4.4,
+        description: "Refreshing lime soda with a hint of mint.",
+        veg: true
+    },
+    {
+        id: 25, name: "French Fries", category: "Snacks",
+        price: 89, oldPrice: 119, rating: 4.6,
+        description: "Golden crispy fries seasoned to perfection.",
+        veg: true
+    },
+    {
+        id: 26, name: "Peri Peri Fries", category: "Snacks",
+        price: 109, oldPrice: 139, rating: 4.7,
+        description: "Crispy fries tossed in spicy peri-peri seasoning.",
+        veg: true
+    },
+    {
+        id: 27, name: "Samosa (2 pcs)", category: "Snacks",
+        price: 49, oldPrice: 69, rating: 4.5,
+        description: "Crispy pastry filled with spiced potato and peas.",
+        veg: true
+    },
+    {
+        id: 28, name: "Masala Dosa", category: "South Indian",
+        price: 129, oldPrice: 159, rating: 4.8,
+        description: "Crispy dosa stuffed with spiced potato masala.",
+        veg: true
+    },
+    {
+        id: 29, name: "Idli Sambar", category: "South Indian",
+        price: 89, oldPrice: 119, rating: 4.6,
+        description: "Soft steamed idlis served with sambar and chutney.",
+        veg: true
+    },
+    {
+        id: 30, name: "Paneer Kathi Roll", category: "Rolls",
+        price: 149, oldPrice: 189, rating: 4.7,
+        description: "Spiced paneer wrapped in a soft flaky roll.",
+        veg: true
     }
 ];
 
-let products = loadStorage(STORAGE_KEYS.products, DEFAULT_PRODUCTS);
+/* Create 100+ menu entries using the starter menu. */
+function createFullMenu() {
+    const products = starterProducts.map(product => ({
+        ...product,
+        image: product.image || getImage(product.name, product.category)
+    }));
 
-if (!Array.isArray(products) || products.length === 0) {
-    products = [...DEFAULT_PRODUCTS];
-}
+    const variants = [
+        { suffix: "Special", add: 20 },
+        { suffix: "Deluxe", add: 40 },
+        { suffix: "Classic", add: 0 }
+    ];
 
-let cart = loadStorage(STORAGE_KEYS.cart, []);
-let wishlist = loadStorage(STORAGE_KEYS.wishlist, []);
-let orders = loadStorage(STORAGE_KEYS.orders, []);
+    let id = 31;
 
-let activeCategory = "All";
-let searchQuery = "";
-let sortMode = "featured";
-let activeCoupon = loadStorage(STORAGE_KEYS.coupon, null);
+    starterProducts.forEach((product, index) => {
+        variants.forEach((variant, variantIndex) => {
+            if (products.length >= 110) return;
 
-
-/* =========================
-   4. CATEGORIES
-========================= */
-
-const CATEGORY_ICONS = {
-    All: "🍽️",
-    Pizza: "🍕",
-    Burgers: "🍔",
-    Wraps: "🌯",
-    Pasta: "🍝",
-    Indian: "🍛",
-    Chinese: "🥡",
-    Desserts: "🍰",
-    Drinks: "🥤"
-};
-
-function getCategories() {
-    return ["All", ...new Set(products.map(product => product.category))];
-}
-
-
-/* =========================
-   5. PRODUCT RENDERING
-========================= */
-
-function getFilteredProducts() {
-    let list = products.filter(product => {
-        const matchesCategory =
-            activeCategory === "All" ||
-            product.category === activeCategory;
-
-        const query = searchQuery.toLowerCase();
-
-        const matchesSearch =
-            !query ||
-            product.name.toLowerCase().includes(query) ||
-            product.category.toLowerCase().includes(query) ||
-            (product.description || "").toLowerCase().includes(query);
-
-        return matchesCategory && matchesSearch;
+            products.push({
+                ...product,
+                id: id++,
+                name: `${product.name} ${variant.suffix}`,
+                price: product.price + variant.add,
+                oldPrice: product.oldPrice + variant.add,
+                badge: variantIndex === 1 ? "Premium" : "",
+                description: `${variant.suffix} version of ${product.name}. Freshly prepared vegetarian food.`,
+                image: product.image || getImage(product.name, product.category)
+            });
+        });
     });
 
-    if (sortMode === "price-low") {
-        list.sort((a, b) => a.price - b.price);
-    } else if (sortMode === "price-high") {
-        list.sort((a, b) => b.price - a.price);
-    } else if (sortMode === "rating") {
-        list.sort((a, b) => b.rating - a.rating);
-    } else if (sortMode === "name") {
-        list.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return list;
+    return products;
 }
 
+let products = readStorage(CC.storage.products, null);
+
+if (!Array.isArray(products) || products.length === 0) {
+    products = createFullMenu();
+    writeStorage(CC.storage.products, products);
+}
+
+let cart = readStorage(CC.storage.cart, []);
+let wishlist = readStorage(CC.storage.wishlist, []);
+let orders = readStorage(CC.storage.orders, []);
+let activeCategory = "All";
+let searchTerm = "";
+let activeCoupon = readStorage(CC.storage.coupon, null);
+let lastInvoice = readStorage(CC.storage.lastOrder, null);
+
+/* Normalise data in case storage contains invalid entries. */
+if (!Array.isArray(cart)) cart = [];
+if (!Array.isArray(wishlist)) wishlist = [];
+if (!Array.isArray(orders)) orders = [];
+
+cart = cart.filter(item =>
+    item && products.some(product => String(product.id) === String(item.id)) &&
+    Number(item.quantity) > 0
+);
+
+wishlist = wishlist.filter(id =>
+    products.some(product => String(product.id) === String(id))
+);
+
+/* =========================================================
+   3. TOAST NOTIFICATIONS
+========================================================= */
+
+function showToast(message, type = "success") {
+    let container = $("#toast-container");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.setAttribute("aria-live", "polite");
+        container.style.cssText =
+            "position:fixed;right:20px;bottom:20px;z-index:99999;" +
+            "display:flex;flex-direction:column;gap:10px;max-width:90vw;";
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = `cc-toast cc-toast-${type}`;
+    toast.textContent = message;
+    toast.style.cssText =
+        "padding:14px 18px;border-radius:12px;background:#171717;" +
+        "color:#fff;box-shadow:0 8px 28px #0003;font-size:14px;" +
+        "animation:ccToastIn .25s ease;";
+
+    if (!$("#cc-toast-styles")) {
+        const style = document.createElement("style");
+        style.id = "cc-toast-styles";
+        style.textContent = `
+            @keyframes ccToastIn {
+                from {opacity:0;transform:translateY(12px)}
+                to {opacity:1;transform:translateY(0)}
+            }
+            .cc-toast-error {border-left:4px solid #ff4242}
+            .cc-toast-success {border-left:4px solid #ff6b00}
+        `;
+        document.head.appendChild(style);
+    }
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(10px)";
+        toast.style.transition = ".25s ease";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+/* =========================================================
+   4. PRODUCT CARD RENDERING
+========================================================= */
+
 function productCard(product) {
-    const isLiked = wishlist.includes(product.id);
+    const favourite = wishlist.some(id => String(id) === String(product.id));
+    const discount = product.oldPrice > product.price
+        ? Math.round((1 - product.price / product.oldPrice) * 100)
+        : 0;
 
     return `
-        <article class="product-card" data-product-id="${product.id}">
+        <article class="product-card cc-product-card" data-product-id="${escapeHTML(product.id)}">
             <div class="product-image-wrap">
                 <img
                     class="product-image"
-                    src="${escapeHTML(product.image)}"
+                    src="${escapeHTML(product.image || getImage(product.name, product.category))}"
                     alt="${escapeHTML(product.name)}"
                     loading="lazy"
-                    onerror="this.onerror=null;this.src='https://placehold.co/600x450/171717/FF6B00?text=CraveCart';"
+                    onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';"
                 >
 
-                ${product.badge ? `
-                    <span class="product-badge">
-                        ${escapeHTML(product.badge)}
-                    </span>
-                ` : ""}
+                ${product.badge ? `<span class="product-badge">${escapeHTML(product.badge)}</span>` : ""}
+                ${discount ? `<span class="cc-discount-badge">${discount}% OFF</span>` : ""}
 
                 <button
-                    class="wishlist-button ${isLiked ? "is-liked" : ""}"
+                    class="wishlist-btn ${favourite ? "active" : ""}"
                     type="button"
-                    data-action="wishlist"
-                    data-id="${product.id}"
-                    aria-label="Toggle wishlist"
-                    title="Add to wishlist"
-                >${isLiked ? "♥" : "♡"}</button>
+                    data-action="toggle-favourite"
+                    data-id="${escapeHTML(product.id)}"
+                    aria-label="${favourite ? "Remove from favourites" : "Add to favourites"}"
+                    title="Add to favourites"
+                >${favourite ? "♥" : "♡"}</button>
             </div>
 
             <div class="product-info">
-                <div class="product-meta">
-                    <span class="product-category">
-                        ${escapeHTML(product.category)}
-                    </span>
-                    <span class="product-rating">
-                        ★ ${Number(product.rating || 0).toFixed(1)}
-                    </span>
+                <div class="product-category">${escapeHTML(product.category || "Vegetarian")}</div>
+                <h3 class="product-name">${escapeHTML(product.name)}</h3>
+                <p class="product-description">${escapeHTML(product.description || "Freshly prepared and delicious.")}</p>
+
+                <div class="product-rating">
+                    <span aria-label="Rating">★</span>
+                    <span>${Number(product.rating || 4.5).toFixed(1)}</span>
+                    <span class="rating-label">• Fresh & tasty</span>
                 </div>
 
-                <h3 class="product-title">
-                    ${escapeHTML(product.name)}
-                </h3>
-
-                <p class="product-description">
-                    ${escapeHTML(product.description || "")}
-                </p>
-
-                <div class="product-footer">
-                    <div class="product-pricing">
-                        <strong>${formatPrice(product.price)}</strong>
-                        ${product.oldPrice > product.price ? `
-                            <del>${formatPrice(product.oldPrice)}</del>
-                        ` : ""}
+                <div class="product-card-bottom">
+                    <div class="product-price">
+                        <strong>${money(product.price)}</strong>
+                        ${product.oldPrice > product.price
+                            ? `<del>${money(product.oldPrice)}</del>`
+                            : ""}
                     </div>
 
                     <button
-                        class="add-to-cart-button"
+                        class="add-to-cart-btn"
                         type="button"
                         data-action="add-cart"
-                        data-id="${product.id}"
-                    >
-                        <span aria-hidden="true">+</span>
-                        Add
-                    </button>
-                </div>
-
-                <div class="product-delivery">
-                    <span>◷ ${escapeHTML(product.time || "20–30 min")}</span>
-                    <span>● Pure Veg</span>
+                        data-id="${escapeHTML(product.id)}"
+                    >+ Add</button>
                 </div>
             </div>
         </article>
     `;
 }
 
-function renderProducts() {
-    const grid =
-        $("#products-grid") ||
-        $("#product-grid") ||
-        $("[data-products-grid]");
+function getFilteredProducts() {
+    let list = [...products];
 
+    if (activeCategory !== "All") {
+        list = list.filter(product =>
+            String(product.category).toLowerCase() === activeCategory.toLowerCase()
+        );
+    }
+
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        list = list.filter(product =>
+            `${product.name} ${product.category} ${product.description || ""}`
+                .toLowerCase().includes(term)
+        );
+    }
+
+    const sort = $("#sort-products")?.value || "featured";
+
+    if (sort === "price-low") list.sort((a, b) => a.price - b.price);
+    else if (sort === "price-high") list.sort((a, b) => b.price - a.price);
+    else if (sort === "rating") list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    else if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name));
+
+    return list;
+}
+
+function renderProducts() {
+    const grid = $("#products-grid");
     if (!grid) return;
 
-    const filtered = getFilteredProducts();
+    const list = getFilteredProducts();
 
-    if (filtered.length === 0) {
-        grid.innerHTML = `
-            <div class="empty-state">
-                <div style="font-size:48px">🍽️</div>
-                <h3>No dishes found</h3>
-                <p>Try another search or category.</p>
-                <button type="button" data-action="clear-search">
-                    Show all dishes
-                </button>
-            </div>
-        `;
-        return;
-    }
+    grid.innerHTML = list.map(productCard).join("");
 
-    grid.innerHTML = filtered.map(productCard).join("");
-    updateProductCount(filtered.length);
+    const count = $("#product-results-count");
+    if (count) count.textContent = `${list.length} items`;
+
+    const noResults = $("#no-results");
+    if (noResults) noResults.hidden = list.length !== 0;
+
+    const showAll = $("#show-all-products");
+    if (showAll) showAll.hidden = list.length !== 0;
+
+    grid.setAttribute("aria-busy", "false");
 }
 
-function updateProductCount(count) {
-    const element =
-        $("#product-count") ||
-        $("[data-product-count]");
-
-    if (element) {
-        element.textContent = `${count} dishes`;
-    }
-}
+/* =========================================================
+   5. CATEGORY FILTERS
+========================================================= */
 
 function renderCategories() {
-    const container =
-        $("#category-list") ||
-        $("#categories-list") ||
-        $("[data-category-list]");
-
+    const container = $("#category-list");
     if (!container) return;
 
-    container.innerHTML = getCategories().map(category => `
+    const categories = ["All", ...new Set(products.map(product => product.category).filter(Boolean))];
+
+    container.innerHTML = categories.map(category => `
         <button
             type="button"
-            class="category-button ${activeCategory === category ? "active" : ""}"
+            class="category-btn ${activeCategory === category ? "active" : ""}"
             data-action="category"
             data-category="${escapeHTML(category)}"
-        >
-            <span>${CATEGORY_ICONS[category] || "🍴"}</span>
-            <span>${escapeHTML(category)}</span>
-        </button>
+        >${escapeHTML(category === "All" ? "All Items" : category)}</button>
     `).join("");
 }
 
+function setCategory(category) {
+    activeCategory = category || "All";
+    renderCategories();
+    renderProducts();
+}
 
-/* =========================
-   6. CART SYSTEM
-========================= */
+/* =========================================================
+   6. CART OPERATIONS
+========================================================= */
 
 function saveCart() {
-    saveStorage(STORAGE_KEYS.cart, cart);
+    writeStorage(CC.storage.cart, cart);
 }
 
-function getProduct(productId) {
-    return products.find(product => String(product.id) === String(productId));
-}
-
-function addToCart(productId, quantity = 1) {
-    const product = getProduct(productId);
+function addToCart(id, quantity = 1) {
+    const product = products.find(item => String(item.id) === String(id));
 
     if (!product) {
         showToast("Product not found.", "error");
         return;
     }
 
-    const existing = cart.find(item => String(item.id) === String(productId));
+    const existing = cart.find(item => String(item.id) === String(id));
 
     if (existing) {
         existing.quantity += quantity;
     } else {
         cart.push({
             id: product.id,
-            quantity: Math.max(1, quantity)
+            quantity,
+            name: product.name,
+            price: Number(product.price),
+            image: product.image
         });
     }
 
     saveCart();
     renderCart();
-    showToast(`${product.name} added to your cart!`);
+    showToast(`${product.name} added to cart!`);
 }
 
-function removeFromCart(productId) {
-    cart = cart.filter(item => String(item.id) !== String(productId));
-    saveCart();
-    renderCart();
-    showToast("Item removed from cart.");
-}
-
-function updateCartQuantity(productId, change) {
-    const item = cart.find(
-        entry => String(entry.id) === String(productId)
-    );
-
+function updateQuantity(id, change) {
+    const item = cart.find(entry => String(entry.id) === String(id));
     if (!item) return;
 
     item.quantity += change;
 
     if (item.quantity <= 0) {
-        removeFromCart(productId);
-        return;
+        cart = cart.filter(entry => String(entry.id) !== String(id));
     }
 
     saveCart();
     renderCart();
 }
 
-function getCartItems() {
-    return cart
-        .map(item => {
-            const product = getProduct(item.id);
-            if (!product) return null;
+function removeFromCart(id) {
+    const item = cart.find(entry => String(entry.id) === String(id));
 
-            return {
-                ...product,
-                quantity: Math.max(1, Number(item.quantity) || 1),
-                lineTotal:
-                    product.price * Math.max(1, Number(item.quantity) || 1)
-            };
-        })
-        .filter(Boolean);
+    cart = cart.filter(entry => String(entry.id) !== String(id));
+    saveCart();
+    renderCart();
+
+    if (item) showToast(`${item.name} removed from cart.`);
 }
 
-function getCartTotals() {
-    const items = getCartItems();
-
-    const subtotal = items.reduce(
-        (total, item) => total + item.lineTotal, 0
-    );
-
-    const delivery =
-        subtotal === 0 || subtotal >= CONFIG.freeDeliveryAbove
-            ? 0
-            : CONFIG.deliveryFee;
-
-    const discount =
-        activeCoupon === "CRAVE10"
-            ? Math.min(Math.round(subtotal * 0.10), 150)
-            : 0;
-
-    const taxableAmount = Math.max(0, subtotal - discount);
-    const tax = Math.round(taxableAmount * CONFIG.taxRate);
-
-    return {
-        subtotal,
-        delivery,
-        discount,
-        tax,
-        total: subtotal + delivery + tax - discount
-    };
+function cartSubtotal() {
+    return cart.reduce((sum, item) => {
+        const product = products.find(p => String(p.id) === String(item.id));
+        const price = product ? Number(product.price) : Number(item.price);
+        return sum + price * Number(item.quantity);
+    }, 0);
 }
 
-function renderCart() {
-    const items = getCartItems();
-    const totals = getCartTotals();
+function calculateBill() {
+    const subtotal = cartSubtotal();
+    const delivery = subtotal === 0 || subtotal >= CC.freeDeliveryMinimum
+        ? 0
+        : CC.deliveryFee;
 
-    const cartContainer =
-        $("#cart-items") ||
-        $("#cart-items-container") ||
-        $("[data-cart-items]");
+    let discount = 0;
 
-    if (cartContainer) {
-        if (items.length === 0) {
-            cartContainer.innerHTML = `
-                <div class="empty-cart">
-                    <div style="font-size:48px">🛒</div>
-                    <h3>Your cart is empty</h3>
-                    <p>Add some delicious food to get started.</p>
-                    <button type="button" data-action="close-cart">
-                        Explore menu
-                    </button>
-                </div>
-            `;
-        } else {
-            cartContainer.innerHTML = items.map(item => `
-                <div class="cart-item" data-cart-item="${item.id}">
-                    <img
-                        src="${escapeHTML(item.image)}"
-                        alt="${escapeHTML(item.name)}"
-                        onerror="this.onerror=null;this.src='https://placehold.co/120x120/171717/FF6B00?text=Food';"
-                    >
-
-                    <div class="cart-item-info">
-                        <h4>${escapeHTML(item.name)}</h4>
-                        <strong>${formatPrice(item.lineTotal)}</strong>
-
-                        <div class="quantity-control">
-                            <button
-                                type="button"
-                                data-action="quantity-minus"
-                                data-id="${item.id}"
-                                aria-label="Decrease quantity"
-                            >−</button>
-
-                            <span>${item.quantity}</span>
-
-                            <button
-                                type="button"
-                                data-action="quantity-plus"
-                                data-id="${item.id}"
-                                aria-label="Increase quantity"
-                            >+</button>
-                        </div>
-                    </div>
-
-                    <button
-                        class="remove-cart-item"
-                        type="button"
-                        data-action="remove-cart"
-                        data-id="${item.id}"
-                        aria-label="Remove item"
-                    >×</button>
-                </div>
-            `).join("");
+    if (activeCoupon && subtotal > 0) {
+        if (activeCoupon.code === "CRAVE10") {
+            discount = Math.min(Math.round(subtotal * 0.10), 150);
+        } else if (activeCoupon.code === "WELCOME50" && subtotal >= 299) {
+            discount = 50;
+        } else if (activeCoupon.code === "FREESHIP" && subtotal >= 199) {
+            discount = delivery;
         }
     }
 
-    setText(["cart-subtotal", "subtotal"], formatPrice(totals.subtotal));
-    setText(["cart-delivery", "delivery-fee"], formatPrice(totals.delivery));
-    setText(["cart-tax", "tax-amount"], formatPrice(totals.tax));
-    setText(["cart-discount", "discount-amount"], formatPrice(totals.discount));
-    setText(["cart-total", "grand-total", "total-price"], formatPrice(totals.total));
+    const taxableAmount = Math.max(0, subtotal - discount);
+    const tax = Math.round(taxableAmount * CC.taxRate * 100) / 100;
+    const total = Math.max(0, subtotal + delivery + tax - discount);
 
-    const badgeCount = items.reduce(
-        (sum, item) => sum + item.quantity, 0
-    );
+    return { subtotal, delivery, discount, tax, total };
+}
 
-    setText(["cart-count", "cart-badge"], badgeCount);
+function renderCart() {
+    const itemsContainer = $("#cart-items");
+    const { subtotal, delivery, discount, tax, total } = calculateBill();
 
-    $$("[data-cart-count]").forEach(element => {
-        element.textContent = badgeCount;
+    const itemCount = cart.reduce((sum, item) => sum + Number(item.quantity), 0);
+
+    ["#cart-count", "#cart-heading-count"].forEach(selector => {
+        const element = $(selector);
+        if (element) element.textContent = itemCount;
     });
 
-    const freeDeliveryMessage =
-        $("#free-delivery-message") ||
-        $("[data-free-delivery-message]");
+    if (itemsContainer) {
+        if (cart.length === 0) {
+            itemsContainer.innerHTML = `
+                <div class="empty-cart cc-empty-state">
+                    <div style="font-size:48px;margin-bottom:12px">🛒</div>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some delicious vegetarian food to get started.</p>
+                    <button type="button" class="primary-btn" data-action="close-cart">Explore Menu</button>
+                </div>
+            `;
+        } else {
+            itemsContainer.innerHTML = cart.map(item => {
+                const product = products.find(p => String(p.id) === String(item.id));
+                const name = product?.name || item.name;
+                const image = product?.image || item.image || getImage(name, "");
+                const price = Number(product?.price ?? item.price);
 
-    if (freeDeliveryMessage) {
-        freeDeliveryMessage.textContent =
-            totals.subtotal >= CONFIG.freeDeliveryAbove
-                ? "🎉 You've unlocked free delivery!"
-                : `Add ${formatPrice(CONFIG.freeDeliveryAbove - totals.subtotal)} more for free delivery.`;
+                return `
+                    <div class="cart-item cc-cart-item">
+                        <img src="${escapeHTML(image)}" alt="${escapeHTML(name)}"
+                            onerror="this.style.display='none'">
+                        <div class="cart-item-info">
+                            <h4>${escapeHTML(name)}</h4>
+                            <p>${money(price)}</p>
+                            <div class="cart-quantity">
+                                <button type="button" data-action="quantity" data-id="${escapeHTML(item.id)}" data-change="-1" aria-label="Decrease quantity">−</button>
+                                <span>${item.quantity}</span>
+                                <button type="button" data-action="quantity" data-id="${escapeHTML(item.id)}" data-change="1" aria-label="Increase quantity">+</button>
+                            </div>
+                        </div>
+                        <div class="cart-item-end">
+                            <strong>${money(price * item.quantity)}</strong>
+                            <button type="button" data-action="remove-cart" data-id="${escapeHTML(item.id)}" aria-label="Remove item">Remove</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
     }
-}
 
-function setText(ids, value) {
-    ids.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value;
-    });
-}
+    setText("#cart-subtotal", money(subtotal));
+    setText("#cart-delivery", delivery === 0 && subtotal > 0 ? "FREE" : money(delivery));
+    setText("#cart-tax", money(tax));
+    setText("#cart-discount", `−${money(discount)}`);
+    setText("#cart-total", money(total));
+    setText("#checkout-total", money(total));
 
+    const discountRow = $("#discount-row");
+    if (discountRow) discountRow.hidden = discount <= 0;
 
-/* =========================
-   7. WISHLIST
-========================= */
+    const progressText = $("#delivery-progress-text");
+    const progressBar = $("#cart-progress-bar");
 
-function toggleWishlist(productId) {
-    const product = getProduct(productId);
-    if (!product) return;
-
-    if (wishlist.includes(product.id)) {
-        wishlist = wishlist.filter(id => id !== product.id);
-        showToast("Removed from wishlist.");
+    if (subtotal >= CC.freeDeliveryMinimum) {
+        if (progressText) progressText.textContent = "🎉 You've unlocked free delivery!";
+        if (progressBar) progressBar.style.width = "100%";
     } else {
-        wishlist.push(product.id);
-        showToast("Added to wishlist ♥");
+        const remaining = CC.freeDeliveryMinimum - subtotal;
+        if (progressText) progressText.textContent =
+            `Add ${money(remaining)} more for free delivery`;
+        if (progressBar) {
+            progressBar.style.width =
+                `${Math.min(100, subtotal / CC.freeDeliveryMinimum * 100)}%`;
+        }
     }
 
-    saveStorage(STORAGE_KEYS.wishlist, wishlist);
+    if (cart.length === 0 && activeCoupon) {
+        activeCoupon = null;
+        writeStorage(CC.storage.coupon, null);
+        updateCouponMessage("");
+    }
+}
+
+/* =========================================================
+   7. WISHLIST / FAVOURITES
+========================================================= */
+
+function toggleFavourite(id) {
+    const exists = wishlist.some(item => String(item) === String(id));
+
+    if (exists) {
+        wishlist = wishlist.filter(item => String(item) !== String(id));
+        showToast("Removed from favourites.");
+    } else {
+        wishlist.push(id);
+        showToast("Added to favourites ❤️");
+    }
+
+    writeStorage(CC.storage.wishlist, wishlist);
     renderProducts();
     renderWishlist();
+    updateWishlistCount();
+}
+
+function updateWishlistCount() {
+    const count = $("#wishlist-count");
+    if (count) count.textContent = wishlist.length;
 }
 
 function renderWishlist() {
-    const container =
-        $("#wishlist-items") ||
-        $("#wishlist-products") ||
-        $("[data-wishlist-items]");
-
+    const container = $("#wishlist-items");
     if (!container) return;
 
-    const items = products.filter(product => wishlist.includes(product.id));
+    const favouriteProducts = products.filter(product =>
+        wishlist.some(id => String(id) === String(product.id))
+    );
 
-    container.innerHTML = items.length
-        ? items.map(productCard).join("")
-        : `
-            <div class="empty-state">
-                <div style="font-size:42px">♡</div>
-                <h3>Your wishlist is empty</h3>
-                <p>Save your favourite dishes here.</p>
+    if (favouriteProducts.length === 0) {
+        container.innerHTML = `
+            <div class="cc-empty-state">
+                <div style="font-size:44px">♡</div>
+                <h3>No favourites yet</h3>
+                <p>Tap the heart on any food item to save it here.</p>
             </div>
         `;
+        return;
+    }
 
-    setText(["wishlist-count"], wishlist.length);
+    container.innerHTML = favouriteProducts.map(product => `
+        <div class="wishlist-item cc-wishlist-item">
+            <img src="${escapeHTML(product.image || getImage(product.name, product.category))}"
+                 alt="${escapeHTML(product.name)}" loading="lazy">
+            <div class="wishlist-item-info">
+                <h4>${escapeHTML(product.name)}</h4>
+                <strong>${money(product.price)}</strong>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+                    <button type="button" data-action="add-cart" data-id="${escapeHTML(product.id)}">Add to cart</button>
+                    <button type="button" data-action="toggle-favourite" data-id="${escapeHTML(product.id)}">Remove ♥</button>
+                </div>
+            </div>
+        </div>
+    `).join("");
 }
 
+/* =========================================================
+   8. MODAL AND DRAWER CONTROLS
+========================================================= */
 
-/* =========================
-   8. MODAL / DRAWER HELPERS
-========================= */
-
-function openElement(element) {
+function openElement(id) {
+    const element = document.getElementById(id);
     if (!element) return;
 
-    element.classList.add("open", "active", "show");
+    element.hidden = false;
+    element.classList.add("active", "open");
     element.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
+    document.body.classList.add("cc-modal-open");
 }
 
-function closeElement(element) {
+function closeElement(id) {
+    const element = document.getElementById(id);
     if (!element) return;
 
-    element.classList.remove("open", "active", "show");
+    element.classList.remove("active", "open");
     element.setAttribute("aria-hidden", "true");
 
-    if (!$(".modal.open, .modal.active, .drawer.open, .drawer.active, .cart-drawer.open, .cart-drawer.active")) {
-        document.body.classList.remove("modal-open");
+    if (id === "cart-drawer" || id.endsWith("-overlay")) {
+        element.hidden = true;
+    } else {
+        element.hidden = true;
+    }
+
+    if (!$(".active[role='dialog'], .active.modal, .active.cart-drawer")) {
+        document.body.classList.remove("cc-modal-open");
     }
 }
 
 function openCart() {
-    const drawer =
-        $("#cart-drawer") ||
-        $("#cart-sidebar") ||
-        $(".cart-drawer");
-
-    openElement(drawer);
+    renderCart();
+    openElement("cart-overlay");
+    openElement("cart-drawer");
 }
 
 function closeCart() {
-    const drawer =
-        $("#cart-drawer") ||
-        $("#cart-sidebar") ||
-        $(".cart-drawer");
-
-    closeElement(drawer);
+    closeElement("cart-drawer");
+    closeElement("cart-overlay");
 }
 
 function openWishlist() {
-    const modal =
-        $("#wishlist-modal") ||
-        $("#wishlist-drawer");
-
     renderWishlist();
-    openElement(modal);
+    openElement("wishlist-overlay");
+    openElement("wishlist-modal");
 }
 
 function closeWishlist() {
-    closeElement($("#wishlist-modal") || $("#wishlist-drawer"));
+    closeElement("wishlist-modal");
+    closeElement("wishlist-overlay");
 }
 
+function openCheckout() {
+    if (cart.length === 0) {
+        showToast("Your cart is empty.", "error");
+        return;
+    }
 
-/* =========================
-   9. COUPON SYSTEM
-========================= */
+    if (cartSubtotal() < CC.minimumOrder) {
+        showToast(`Minimum order is ${money(CC.minimumOrder)}.`, "error");
+        return;
+    }
+
+    renderCart();
+    closeCart();
+    openElement("checkout-overlay");
+    openElement("checkout-modal");
+}
+
+function closeCheckout() {
+    closeElement("checkout-modal");
+    closeElement("checkout-overlay");
+}
+
+function closeInvoice() {
+    closeElement("invoice-modal");
+}
+
+/* =========================================================
+   9. COUPONS
+========================================================= */
+
+function updateCouponMessage(message, error = false) {
+    const element = $("#coupon-message");
+    if (!element) return;
+
+    element.textContent = message;
+    element.style.color = error ? "#dc2626" : "#15803d";
+}
 
 function applyCoupon() {
-    const input =
-        $("#coupon-code") ||
-        $("#coupon-input") ||
-        $("[name='coupon']");
-
+    const input = $("#coupon-code");
     if (!input) {
-        showToast("Coupon field not found.", "error");
+        showToast("Coupon field is unavailable.", "error");
         return;
     }
 
     const code = input.value.trim().toUpperCase();
 
     if (!code) {
-        showToast("Enter a coupon code first.", "warning");
+        updateCouponMessage("Enter a coupon code.", true);
         return;
     }
+
+    if (cart.length === 0) {
+        updateCouponMessage("Add products to your cart first.", true);
+        return;
+    }
+
+    const subtotal = cartSubtotal();
 
     if (code === "CRAVE10") {
-        activeCoupon = code;
-        saveStorage(STORAGE_KEYS.coupon, activeCoupon);
-        renderCart();
-        showToast("CRAVE10 applied! You saved 10%.");
+        activeCoupon = { code };
+        updateCouponMessage("Coupon applied! Save 10% up to ₹150.");
+    } else if (code === "WELCOME50" && subtotal >= 299) {
+        activeCoupon = { code };
+        updateCouponMessage("Welcome offer applied! ₹50 off.");
+    } else if (code === "FREESHIP" && subtotal >= 199) {
+        activeCoupon = { code };
+        updateCouponMessage("Free delivery coupon applied!");
+    } else if (code === "WELCOME50") {
+        updateCouponMessage("Add items worth ₹299 to use this coupon.", true);
+        return;
+    } else if (code === "FREESHIP") {
+        updateCouponMessage("Minimum cart value is ₹199.", true);
+        return;
     } else {
-        showToast("Invalid coupon code.", "error");
+        updateCouponMessage("Invalid coupon code.", true);
+        return;
     }
-}
 
-function clearCoupon() {
-    activeCoupon = null;
-    saveStorage(STORAGE_KEYS.coupon, null);
+    writeStorage(CC.storage.coupon, activeCoupon);
     renderCart();
+    showToast("Coupon applied successfully!");
 }
 
+/* =========================================================
+   10. CHECKOUT AND ORDER CREATION
+========================================================= */
 
-/* =========================
-   10. CHECKOUT & BILL
-========================= */
+function fieldValue(id) {
+    return document.getElementById(id)?.value?.trim() || "";
+}
 
-function openCheckout() {
-    if (getCartItems().length === 0) {
-        showToast("Your cart is empty!", "warning");
+function checkoutFormSubmit(event) {
+    event.preventDefault();
+
+    if (cart.length === 0) {
+        showToast("Your cart is empty.", "error");
         return;
     }
 
-    const modal =
-        $("#checkout-modal") ||
-        $("#checkout-dialog");
+    const name = fieldValue("customer-name");
+    const phone = fieldValue("customer-phone");
+    const email = fieldValue("customer-email");
+    const address = fieldValue("customer-address");
+    const city = fieldValue("customer-city");
+    const pincode = fieldValue("customer-pincode");
 
-    if (!modal) {
-        showToast("Checkout modal not found in index.html.", "error");
+    if (!name || !phone || !address || !city || !pincode) {
+        showToast("Please fill in all required fields.", "error");
         return;
     }
 
-    renderCart();
-    openElement(modal);
-}
-
-function closeCheckout() {
-    closeElement($("#checkout-modal") || $("#checkout-dialog"));
-}
-
-function getInputValue(selectors) {
-    for (const selector of selectors) {
-        const element = $(selector);
-        if (element) return element.value.trim();
-    }
-    return "";
-}
-
-function handleCheckout(event) {
-    if (event) event.preventDefault();
-
-    const items = getCartItems();
-
-    if (items.length === 0) {
-        showToast("Your cart is empty!", "warning");
-        return;
-    }
-
-    const customerName = getInputValue([
-        "#customer-name",
-        "#checkout-name",
-        "[name='name']"
-    ]);
-
-    const phone = getInputValue([
-        "#customer-phone",
-        "#checkout-phone",
-        "[name='phone']"
-    ]);
-
-    const address = getInputValue([
-        "#customer-address",
-        "#checkout-address",
-        "[name='address']"
-    ]);
-
-    const email = getInputValue([
-        "#customer-email",
-        "#checkout-email",
-        "[name='email']"
-    ]);
-
-    if (!customerName || !phone || !address) {
-        showToast("Please fill in your name, phone and address.", "warning");
-        return;
-    }
-
-    if (!/^[0-9+\-\s()]{10,18}$/.test(phone)) {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 10 || digits.length > 13) {
         showToast("Please enter a valid phone number.", "error");
         return;
     }
 
-    const totals = getCartTotals();
+    if (!/^\d{6}$/.test(pincode)) {
+        showToast("Please enter a valid 6-digit PIN code.", "error");
+        return;
+    }
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("Please enter a valid email address.", "error");
+        return;
+    }
+
+    const bill = calculateBill();
 
     const order = {
-        id: createId("CCORDER"),
+        id: makeId("CCORDER"),
         date: new Date().toISOString(),
-        customer: {
-            name: customerName,
-            phone,
-            email,
-            address
-        },
-        items: items.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            lineTotal: item.lineTotal
-        })),
-        totals,
-        coupon: activeCoupon,
+        status: "Order received",
+        customer: { name, phone, email, address, city, pincode },
+        items: cart.map(item => {
+            const product = products.find(p => String(p.id) === String(item.id));
+            return {
+                id: item.id,
+                name: product?.name || item.name,
+                price: Number(product?.price ?? item.price),
+                quantity: Number(item.quantity),
+                image: product?.image || item.image || ""
+            };
+        }),
+        bill,
         paymentMethod: "Cash on Delivery",
-        status: "Demo Order — Not Sent to Restaurant"
+        coupon: activeCoupon?.code || null
     };
 
     orders.unshift(order);
-    saveStorage(STORAGE_KEYS.orders, orders);
+    writeStorage(CC.storage.orders, orders);
+    writeStorage(CC.storage.lastOrder, order);
+
+    lastInvoice = order;
 
     cart = [];
     activeCoupon = null;
 
-    saveCart();
-    saveStorage(STORAGE_KEYS.coupon, null);
+    writeStorage(CC.storage.cart, cart);
+    writeStorage(CC.storage.coupon, null);
 
     closeCheckout();
-    closeCart();
     renderCart();
-
     showInvoice(order);
-    showToast("Demo order created successfully!");
 
-    const form = event?.target;
-    if (form && typeof form.reset === "function") form.reset();
+    const form = $("#checkout-form");
+    if (form) form.reset();
+
+    showToast("Order placed successfully! 🎉");
 }
 
-function showInvoice(order) {
-    const modal = $("#invoice-modal");
+/* =========================================================
+   11. INVOICE GENERATION
+========================================================= */
 
-    const invoiceHTML = buildInvoiceHTML(order);
-
-    if (modal) {
-        const body =
-            $("#invoice-content", modal) ||
-            $(".invoice-content", modal) ||
-            $(".modal-body", modal);
-
-        if (body) {
-            body.innerHTML = invoiceHTML;
-        } else {
-            modal.innerHTML = `
-                <button type="button" data-action="close-invoice" aria-label="Close invoice">×</button>
-                ${invoiceHTML}
-            `;
-        }
-
-        openElement(modal);
-    } else {
-        const win = window.open("", "_blank");
-
-        if (!win) {
-            showToast("Please allow pop-ups to view the invoice.", "warning");
-            return;
-        }
-
-        win.document.write(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width,initial-scale=1">
-                <title>CraveCart Invoice</title>
-                <style>
-                    body{font-family:Arial,sans-serif;padding:30px;max-width:800px;margin:auto;color:#222}
-                    h1{color:#ff6b00}
-                    table{width:100%;border-collapse:collapse;margin:20px 0}
-                    th,td{text-align:left;padding:10px;border-bottom:1px solid #ddd}
-                    .right{text-align:right}
-                    .notice{padding:12px;background:#fff1e8;border-radius:8px}
-                    button{padding:12px 20px;background:#ff6b00;color:#fff;border:0;border-radius:8px;cursor:pointer}
-                    @media print{button{display:none}}
-                </style>
-            </head>
-            <body>
-                ${invoiceHTML}
-                <button onclick="window.print()">Print / Save PDF</button>
-            </body>
-            </html>
-        `);
-
-        win.document.close();
-    }
-}
-
-function buildInvoiceHTML(order) {
-    const rows = order.items.map(item => `
+function invoiceHTML(order) {
+    const itemRows = order.items.map(item => `
         <tr>
             <td>${escapeHTML(item.name)}</td>
             <td>${item.quantity}</td>
-            <td>${formatPrice(item.price)}</td>
-            <td>${formatPrice(item.lineTotal)}</td>
+            <td>${money(item.price)}</td>
+            <td>${money(item.price * item.quantity)}</td>
         </tr>
     `).join("");
 
+    const date = new Date(order.date).toLocaleString("en-IN");
+
     return `
-        <div class="invoice-document">
-            <h1 style="color:#ff6b00">CraveCart</h1>
-            <p><strong>Food. Mood. Delivered.</strong></p>
+        <div class="cc-invoice-document" id="cc-invoice-document">
+            <div class="cc-invoice-header">
+                <div>
+                    <h2 style="margin:0;color:#ff6b00;font-size:30px">CRAVECART</h2>
+                    <p>Fresh food. Happy mood.</p>
+                    <p>Vegetarian Food Ordering</p>
+                </div>
+                <div style="text-align:right">
+                    <h3>INVOICE</h3>
+                    <p><strong>Order ID:</strong> ${escapeHTML(order.id)}</p>
+                    <p><strong>Date:</strong> ${escapeHTML(date)}</p>
+                </div>
+            </div>
+
             <hr>
 
-            <h2>Order Invoice</h2>
+            <h3>Customer details</h3>
+            <p><strong>${escapeHTML(order.customer.name)}</strong></p>
+            <p>${escapeHTML(order.customer.phone)}</p>
+            ${order.customer.email ? `<p>${escapeHTML(order.customer.email)}</p>` : ""}
+            <p>${escapeHTML(order.customer.address)}, ${escapeHTML(order.customer.city)} - ${escapeHTML(order.customer.pincode)}</p>
 
-            <p>
-                <strong>Order ID:</strong> ${escapeHTML(order.id)}<br>
-                <strong>Date:</strong> ${new Date(order.date).toLocaleString("en-IN")}<br>
-                <strong>Status:</strong> ${escapeHTML(order.status)}
-            </p>
-
-            <h3>Customer Details</h3>
-            <p>
-                ${escapeHTML(order.customer.name)}<br>
-                ${escapeHTML(order.customer.phone)}<br>
-                ${escapeHTML(order.customer.email || "Email not provided")}<br>
-                ${escapeHTML(order.customer.address)}
-            </p>
-
-            <table style="width:100%;border-collapse:collapse">
+            <table class="cc-invoice-table" style="width:100%;border-collapse:collapse;margin-top:20px">
                 <thead>
                     <tr>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Item</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Qty</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Price</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Amount</th>
+                        <th style="text-align:left">Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
-                <tbody>${rows}</tbody>
+                <tbody>${itemRows}</tbody>
             </table>
 
-            <div style="max-width:340px;margin-left:auto">
-                <p>Subtotal: <strong>${formatPrice(order.totals.subtotal)}</strong></p>
-                <p>Delivery: <strong>${formatPrice(order.totals.delivery)}</strong></p>
-                <p>Tax (estimate): <strong>${formatPrice(order.totals.tax)}</strong></p>
-                <p>Discount: <strong>${formatPrice(order.totals.discount)}</strong></p>
-                <h2>Total: ${formatPrice(order.totals.total)}</h2>
+            <div style="margin:22px 0 0 auto;max-width:320px">
+                <p>Subtotal: <strong>${money(order.bill.subtotal)}</strong></p>
+                <p>Delivery: <strong>${money(order.bill.delivery)}</strong></p>
+                <p>Tax (5%): <strong>${money(order.bill.tax)}</strong></p>
+                <p>Discount: <strong>−${money(order.bill.discount)}</strong></p>
+                <hr>
+                <h3>Grand Total: ${money(order.bill.total)}</h3>
             </div>
 
-            <p><strong>Payment:</strong> Cash on Delivery (demo only)</p>
-
-            <div style="padding:12px;background:#fff1e8;border-radius:8px">
-                <strong>Demo invoice:</strong> This is a local demonstration order.
-                No restaurant has been notified and no payment has been collected.
-            </div>
-
-            <p>Thank you for choosing CraveCart! ❤️</p>
-
-            <button type="button" onclick="window.print()"
-                style="padding:12px 20px;background:#ff6b00;color:white;border:0;border-radius:8px;cursor:pointer">
-                Print / Save as PDF
-            </button>
+            <p><strong>Payment:</strong> ${escapeHTML(order.paymentMethod)}</p>
+            <p><strong>Status:</strong> ${escapeHTML(order.status)}</p>
+            <p style="text-align:center;margin-top:30px">Thank you for ordering with CraveCart! ❤️</p>
+            <p style="text-align:center;font-size:12px">This is a demo invoice generated by the CraveCart website.</p>
         </div>
     `;
 }
 
-function closeInvoice() {
-    closeElement($("#invoice-modal"));
+function showInvoice(order) {
+    const content = $("#invoice-content");
+    if (content) content.innerHTML = invoiceHTML(order);
+
+    openElement("invoice-modal");
 }
 
+function printInvoice() {
+    const content = $("#cc-invoice-document") || $("#invoice-content");
 
-/* =========================
-   11. ADMIN PANEL
-========================= */
-
-/*
-  DEMO SECURITY WARNING:
-  Password placed in client-side JavaScript is visible to visitors.
-  This is not production-grade authentication.
-*/
-
-function openAdminLogin() {
-    const modal =
-        $("#admin-login-modal") ||
-        $("#admin-login");
-
-    if (modal) {
-        openElement(modal);
+    if (!content) {
+        showToast("Invoice not found.", "error");
         return;
     }
 
-    const password = prompt("Enter CraveCart admin password:");
+    const printWindow = window.open("", "_blank", "width=900,height=700");
 
-    if (password === null) return;
-
-    if (password === CONFIG.adminPassword) {
-        showAdminPanel();
-    } else {
-        showToast("Incorrect admin password.", "error");
-    }
-}
-
-function closeAdminLogin() {
-    closeElement($("#admin-login-modal") || $("#admin-login"));
-}
-
-function handleAdminLogin(event) {
-    if (event) event.preventDefault();
-
-    const passwordInput =
-        $("#admin-password") ||
-        $("#admin-login-password") ||
-        $("[name='admin-password']");
-
-    if (!passwordInput) {
-        showToast("Admin password field not found.", "error");
+    if (!printWindow) {
+        showToast("Please allow pop-ups to print the invoice.", "error");
         return;
     }
 
-    if (passwordInput.value === CONFIG.adminPassword) {
-        closeAdminLogin();
-        passwordInput.value = "";
-        showAdminPanel();
-    } else {
-        showToast("Incorrect admin password.", "error");
-        passwordInput.value = "";
-        passwordInput.focus();
+    printWindow.document.open();
+    printWindow.document.write(`
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>CraveCart Invoice</title>
+            <style>
+                body{font-family:Arial,sans-serif;padding:30px;color:#222}
+                h2,h3,p{margin-top:8px;margin-bottom:8px}
+                table{width:100%;border-collapse:collapse;margin-top:20px}
+                th,td{padding:12px;border:1px solid #ddd;text-align:left}
+                th{background:#f5f5f5}
+                hr{border:0;border-top:1px solid #ddd;margin:20px 0}
+                .cc-invoice-header{display:flex;justify-content:space-between;gap:20px}
+                @media print{body{padding:0}}
+            </style>
+        </head>
+        <body>${content.innerHTML}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+        printWindow.print();
+    }, 400);
+}
+
+function downloadInvoice() {
+    const order = lastInvoice || readStorage(CC.storage.lastOrder, null);
+
+    if (!order) {
+        showToast("No invoice is available yet.", "error");
+        return;
+    }
+
+    const textContent = [
+        "CRAVECART - ORDER INVOICE",
+        "====================================",
+        `Order ID: ${order.id}`,
+        `Date: ${new Date(order.date).toLocaleString("en-IN")}`,
+        "",
+        "CUSTOMER",
+        `Name: ${order.customer.name}`,
+        `Phone: ${order.customer.phone}`,
+        `Address: ${order.customer.address}, ${order.customer.city} - ${order.customer.pincode}`,
+        "",
+        "ITEMS",
+        ...order.items.map(item =>
+            `${item.name} x ${item.quantity} = ${money(item.price * item.quantity)}`
+        ),
+        "",
+        `Subtotal: ${money(order.bill.subtotal)}`,
+        `Delivery: ${money(order.bill.delivery)}`,
+        `Tax: ${money(order.bill.tax)}`,
+        `Discount: ${money(order.bill.discount)}`,
+        `GRAND TOTAL: ${money(order.bill.total)}`,
+        "",
+        `Payment: ${order.paymentMethod}`,
+        `Status: ${order.status}`,
+        "",
+        "Thank you for ordering with CraveCart!"
+    ].join("\n");
+
+    const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = `CraveCart-Invoice-${order.id}.txt`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+/* =========================================================
+   12. SEARCH AND SORT
+========================================================= */
+
+function handleSearch(value) {
+    searchTerm = String(value || "").trim();
+    renderProducts();
+
+    const panel = $("#search-panel");
+    if (panel) panel.hidden = !searchTerm;
+}
+
+function clearSearch() {
+    searchTerm = "";
+
+    const input = $("#product-search");
+    if (input) input.value = "";
+
+    const panel = $("#search-panel");
+    if (panel) panel.hidden = true;
+
+    renderProducts();
+}
+
+function setupSearch() {
+    const input = $("#product-search");
+
+    if (input) {
+        input.addEventListener("input", event => handleSearch(event.target.value));
+    }
+
+    const clear = $("#clear-search");
+    if (clear) clear.addEventListener("click", clearSearch);
+
+    const toggle = $("#search-toggle");
+    if (toggle) {
+        toggle.addEventListener("click", () => {
+            const panel = $("#search-panel");
+            if (!panel) return;
+
+            panel.hidden = !panel.hidden;
+
+            if (!panel.hidden) {
+                setTimeout(() => input?.focus(), 50);
+            }
+        });
+    }
+
+    const sort = $("#sort-products");
+    if (sort) sort.addEventListener("change", renderProducts);
+
+    const reset = $("#reset-filters");
+    if (reset) {
+        reset.addEventListener("click", () => {
+            activeCategory = "All";
+            clearSearch();
+            if (sort) sort.value = "featured";
+            renderCategories();
+            renderProducts();
+        });
+    }
+
+    const showAll = $("#show-all-products");
+    if (showAll) {
+        showAll.addEventListener("click", () => {
+            activeCategory = "All";
+            clearSearch();
+            renderCategories();
+            renderProducts();
+        });
     }
 }
 
-function showAdminPanel() {
-    let panel = $("#admin-panel");
+/* =========================================================
+   13. NEWSLETTER DEMO
+========================================================= */
 
-    if (!panel) {
-        panel = document.createElement("section");
-        panel.id = "admin-panel";
+function setupNewsletter() {
+    const form = $("#newsletter-form");
+    if (!form) return;
 
-        Object.assign(panel.style, {
-            position: "fixed",
-            inset: "0",
-            zIndex: "99990",
-            overflowY: "auto",
-            padding: "24px",
-            background: "#101010",
-            color: "#f5f5f5",
-            fontFamily: "Arial, sans-serif"
-        });
+    form.addEventListener("submit", event => {
+        event.preventDefault();
 
-        document.body.appendChild(panel);
-    }
+        const emailInput = $("input[type='email']", form);
+        const email = emailInput?.value.trim() || "";
 
-    renderAdminPanel();
-    openElement(panel);
-}
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast("Please enter a valid email address.", "error");
+            return;
+        }
 
-function closeAdminPanel() {
-    closeElement($("#admin-panel"));
-}
+        const subscribers = readStorage("cravecart_newsletter", []);
+        if (!subscribers.includes(email)) {
+            subscribers.push(email);
+            writeStorage("cravecart_newsletter", subscribers);
+        }
 
-function renderAdminPanel() {
-    const panel = $("#admin-panel");
-    if (!panel) return;
-
-    const revenue = orders.reduce(
-        (sum, order) => sum + (order.totals?.total || 0), 0
-    );
-
-    panel.innerHTML = `
-        <div style="max-width:1200px;margin:auto">
-            <header style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap">
-                <div>
-                    <h1 style="color:#ff6b00;margin-bottom:6px">CraveCart Admin</h1>
-                    <p style="color:#aaa;margin-top:0">Local demo dashboard</p>
-                </div>
-
-                <button type="button" data-action="admin-close"
-                    style="padding:12px 18px;background:#ff6b00;color:#fff;border:0;border-radius:10px;cursor:pointer">
-                    Close Panel ✕
-                </button>
-            </header>
-
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:24px 0">
-                ${adminStat("Products", products.length)}
-                ${adminStat("Orders", orders.length)}
-                ${adminStat("Wishlist Saves", wishlist.length)}
-                ${adminStat("Demo Order Total", formatPrice(revenue))}
-            </div>
-
-            <section style="background:#1c1c1c;padding:20px;border-radius:16px;margin-bottom:20px">
-                <h2>Add New Product</h2>
-
-                <form id="admin-product-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-                    <input name="name" placeholder="Product name" required>
-                    <input name="category" placeholder="Category e.g. Pizza" required>
-                    <input name="price" type="number" min="1" placeholder="Price" required>
-                    <input name="oldPrice" type="number" min="0" placeholder="Old price">
-                    <input name="image" type="url" placeholder="Image URL" required>
-                    <input name="description" placeholder="Short description">
-                    <input name="rating" type="number" min="1" max="5" step=".1" value="4.5" placeholder="Rating">
-
-                    <button type="submit"
-                        style="padding:12px;background:#ff6b00;color:white;border:0;border-radius:8px;cursor:pointer">
-                        Add Product
-                    </button>
-                </form>
-            </section>
-
-            <section style="background:#1c1c1c;padding:20px;border-radius:16px;margin-bottom:20px">
-                <h2>Product Inventory</h2>
-                <div style="overflow-x:auto">
-                    <table style="width:100%;border-collapse:collapse;min-width:600px">
-                        <thead>
-                            <tr>
-                                <th style="text-align:left;padding:10px">Product</th>
-                                <th style="text-align:left;padding:10px">Category</th>
-                                <th style="text-align:left;padding:10px">Price</th>
-                                <th style="text-align:left;padding:10px">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${products.map(product => `
-                                <tr>
-                                    <td style="padding:10px;border-top:1px solid #333">${escapeHTML(product.name)}</td>
-                                    <td style="padding:10px;border-top:1px solid #333">${escapeHTML(product.category)}</td>
-                                    <td style="padding:10px;border-top:1px solid #333">${formatPrice(product.price)}</td>
-                                    <td style="padding:10px;border-top:1px solid #333">
-                                        <button type="button"
-                                            data-action="admin-delete-product"
-                                            data-id="${product.id}"
-                                            style="background:#d32f2f;color:white;border:0;padding:8px 10px;border-radius:6px;cursor:pointer">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section style="background:#1c1c1c;padding:20px;border-radius:16px;margin-bottom:20px">
-                <h2>Recent Orders</h2>
-
-                ${orders.length ? orders.slice(0, 30).map(order => `
-                    <article style="padding:14px;border-bottom:1px solid #333">
-                        <strong>${escapeHTML(order.id)}</strong>
-                        <p>${escapeHTML(order.customer?.name || "Customer")} · ${formatPrice(order.totals?.total || 0)}</p>
-                        <small style="color:#aaa">${new Date(order.date).toLocaleString("en-IN")}</small>
-                        <p style="color:#ffb37f">${escapeHTML(order.status || "Demo order")}</p>
-                        <button type="button"
-                            data-action="admin-view-invoice"
-                            data-id="${escapeHTML(order.id)}"
-                            style="padding:8px 12px;border:0;border-radius:6px;cursor:pointer">
-                            View Invoice
-                        </button>
-                    </article>
-                `).join("") : "<p>No demo orders yet.</p>"}
-            </section>
-
-            <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <button type="button" data-action="admin-export"
-                    style="padding:12px;background:#ff6b00;color:white;border:0;border-radius:8px;cursor:pointer">
-                    Export Orders CSV
-                </button>
-
-                <button type="button" data-action="admin-reset-products"
-                    style="padding:12px;background:#444;color:white;border:0;border-radius:8px;cursor:pointer">
-                    Restore Default Products
-                </button>
-            </div>
-
-            <p style="color:#aaa;margin-top:24px;line-height:1.6">
-                Demo dashboard only: products and orders are stored in this browser.
-                This panel does not provide secure authentication or a real server-side order system.
-            </p>
-        </div>
-    `;
-
-    $$("input", panel).forEach(input => {
-        Object.assign(input.style, {
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #444",
-            background: "#111",
-            color: "#fff",
-            minWidth: "0"
-        });
+        form.reset();
+        showToast("Thanks for subscribing! 🎉");
     });
 }
 
-function adminStat(label, value) {
-    return `
-        <div style="padding:20px;background:#1c1c1c;border-radius:14px">
-            <p style="color:#aaa;margin:0 0 10px">${escapeHTML(label)}</p>
-            <h2 style="margin:0;color:#ff6b00">${escapeHTML(value)}</h2>
-        </div>
-    `;
+/* =========================================================
+   14. HEADER, SCROLL AND ANIMATIONS
+========================================================= */
+
+function setText(selector, value) {
+    const element = $(selector);
+    if (element) element.textContent = value;
 }
 
-function handleAdminProductAdd(event) {
-    event.preventDefault();
+function setupGeneralUI() {
+    setText("#current-year", new Date().getFullYear());
 
-    const form = event.target;
-    const data = new FormData(form);
+    const backToTop = $("#back-to-top");
 
-    const name = String(data.get("name") || "").trim();
-    const category = String(data.get("category") || "").trim();
-    const price = Number(data.get("price"));
-    const oldPrice = Number(data.get("oldPrice")) || price;
-    const image = String(data.get("image") || "").trim();
-    const description = String(data.get("description") || "").trim();
-    const rating = Number(data.get("rating")) || 4.5;
+    if (backToTop) {
+        window.addEventListener("scroll", () => {
+            backToTop.hidden = window.scrollY < 400;
+        }, { passive: true });
 
-    if (!name || !category || !image || !Number.isFinite(price) || price <= 0) {
-        showToast("Please provide valid product details.", "error");
-        return;
+        backToTop.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
     }
 
-    products.push({
-        id: Date.now(),
-        name,
-        category,
-        price,
-        oldPrice,
-        rating: Math.min(5, Math.max(1, rating)),
-        reviews: 0,
-        badge: "New",
-        veg: true,
-        time: "20–30 min",
-        description,
-        image
+    $$("[data-scroll-to]").forEach(button => {
+        button.addEventListener("click", () => {
+            const target = document.querySelector(button.dataset.scrollTo);
+            target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
     });
 
-    saveStorage(STORAGE_KEYS.products, products);
+    const navToggle = $("#nav-toggle");
+    const navMenu = $("#nav-menu");
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener("click", () => {
+            navMenu.classList.toggle("active");
+            navToggle.setAttribute(
+                "aria-expanded",
+                navMenu.classList.contains("active") ? "true" : "false"
+            );
+        });
+    }
+
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("cc-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        $$(".reveal, .animate-on-scroll, .product-card").forEach(element => {
+            element.classList.add("cc-reveal");
+            observer.observe(element);
+        });
+
+        if (!$("#cc-reveal-style")) {
+            const style = document.createElement("style");
+            style.id = "cc-reveal-style";
+            style.textContent = `
+                .cc-reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+                .cc-reveal.cc-visible{opacity:1;transform:translateY(0)}
+                @media(prefers-reduced-motion:reduce){.cc-reveal{opacity:1;transform:none;transition:none}}
+            `;
+            document.head.appendChild(style);
+        }
+    }
+}
+
+/* =========================================================
+   15. ADMIN SUPPORT
+   NOTE: This is only a front-end demo. No secure authentication.
+========================================================= */
+
+function adminAddProduct(productData) {
+    const product = {
+        id: makeId("PRODUCT"),
+        name: String(productData.name || "").trim(),
+        category: String(productData.category || "Indian").trim(),
+        price: Number(productData.price),
+        oldPrice: Number(productData.oldPrice || productData.price),
+        rating: Number(productData.rating || 4.5),
+        description: String(productData.description || "Freshly prepared vegetarian food."),
+        image: String(productData.image || getImage(productData.name, productData.category)),
+        badge: String(productData.badge || "New"),
+        veg: true
+    };
+
+    if (!product.name || !Number.isFinite(product.price) || product.price <= 0) {
+        showToast("Enter a valid product name and price.", "error");
+        return false;
+    }
+
+    products.unshift(product);
+    writeStorage(CC.storage.products, products);
 
     renderCategories();
     renderProducts();
-    renderAdminPanel();
-
-    showToast("Product added successfully!");
+    showToast("New product added!");
+    return product;
 }
 
-function deleteAdminProduct(productId) {
-    const product = getProduct(productId);
-    if (!product) return;
+function adminDeleteProduct(id) {
+    products = products.filter(product => String(product.id) !== String(id));
+    cart = cart.filter(item => String(item.id) !== String(id));
+    wishlist = wishlist.filter(item => String(item) !== String(id));
 
-    if (!confirm(`Delete "${product.name}"?`)) return;
-
-    products = products.filter(item => String(item.id) !== String(productId));
-    cart = cart.filter(item => String(item.id) !== String(productId));
-    wishlist = wishlist.filter(id => String(id) !== String(productId));
-
-    saveStorage(STORAGE_KEYS.products, products);
-    saveCart();
-    saveStorage(STORAGE_KEYS.wishlist, wishlist);
+    writeStorage(CC.storage.products, products);
+    writeStorage(CC.storage.cart, cart);
+    writeStorage(CC.storage.wishlist, wishlist);
 
     renderCategories();
     renderProducts();
     renderCart();
     renderWishlist();
-    renderAdminPanel();
 
     showToast("Product deleted.");
 }
 
-function resetDefaultProducts() {
-    if (!confirm("Restore the original product list?")) return;
-
-    products = DEFAULT_PRODUCTS.map(product => ({ ...product }));
-
-    saveStorage(STORAGE_KEYS.products, products);
-
-    renderCategories();
-    renderProducts();
-    renderAdminPanel();
-
-    showToast("Default products restored.");
-}
-
-function exportOrdersCSV() {
-    if (orders.length === 0) {
-        showToast("No orders to export.", "warning");
+function adminExportOrdersCSV() {
+    if (!orders.length) {
+        showToast("No orders available to export.", "error");
         return;
     }
 
-    const columns = [
-        "Order ID",
-        "Date",
-        "Customer",
-        "Phone",
-        "Address",
-        "Items",
-        "Subtotal",
-        "Delivery",
-        "Tax",
-        "Discount",
-        "Total",
-        "Status"
+    const rows = [
+        ["Order ID", "Date", "Customer", "Phone", "Items", "Total", "Status"],
+        ...orders.map(order => [
+            order.id,
+            new Date(order.date).toLocaleString("en-IN"),
+            order.customer?.name || "",
+            order.customer?.phone || "",
+            order.items.map(item => `${item.name} x${item.quantity}`).join("; "),
+            order.bill?.total ?? 0,
+            order.status || ""
+        ])
     ];
 
-    const rows = orders.map(order => [
-        order.id,
-        order.date,
-        order.customer?.name || "",
-        order.customer?.phone || "",
-        order.customer?.address || "",
-        order.items.map(item => `${item.name} x${item.quantity}`).join("; "),
-        order.totals?.subtotal || 0,
-        order.totals?.delivery || 0,
-        order.totals?.tax || 0,
-        order.totals?.discount || 0,
-        order.totals?.total || 0,
-        order.status || ""
-    ]);
+    const csv = rows.map(row =>
+        row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")
+    ).join("\r\n");
 
-    const csvCell = value =>
-        '"' + String(value ?? "").replace(/"/g, '""') + '"';
-
-    const csv = [columns, ...rows]
-        .map(row => row.map(csvCell).join(","))
-        .join("\r\n");
-
-    const blob = new Blob(["\uFEFF" + csv], {
-        type: "text/csv;charset=utf-8;"
-    });
-
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
+    const link = document.createElement("a");
 
-    anchor.href = url;
-    anchor.download = "cravecart-orders.csv";
-    anchor.click();
+    link.href = url;
+    link.download = "CraveCart-Orders.csv";
+    link.click();
 
     URL.revokeObjectURL(url);
-    showToast("Orders CSV exported.");
 }
 
-function adminViewInvoice(orderId) {
-    const order = orders.find(item => String(item.id) === String(orderId));
+function setupAdminForms() {
+    const form = $("#admin-product-form");
+    if (form) {
+        form.addEventListener("submit", event => {
+            event.preventDefault();
 
-    if (!order) {
-        showToast("Order not found.", "error");
-        return;
+            const data = {
+                name: fieldValue("admin-product-name"),
+                category: fieldValue("admin-product-category"),
+                price: fieldValue("admin-product-price"),
+                oldPrice: fieldValue("admin-product-old-price"),
+                image: fieldValue("admin-product-image"),
+                description: fieldValue("admin-product-description"),
+                badge: fieldValue("admin-product-badge")
+            };
+
+            const result = adminAddProduct(data);
+            if (result) form.reset();
+        });
     }
 
-    showInvoice(order);
+    const exportButton = $("#admin-export-orders");
+    if (exportButton) exportButton.addEventListener("click", adminExportOrdersCSV);
 }
 
-
-/* =========================
-   12. MOBILE NAVIGATION
-========================= */
-
-function toggleMobileMenu() {
-    const menu =
-        $("#nav-menu") ||
-        $("#mobile-menu") ||
-        $(".nav-links");
-
-    if (!menu) return;
-
-    menu.classList.toggle("open");
-    menu.classList.toggle("active");
-
-    const button =
-        $("#menu-toggle") ||
-        $("[data-action='menu-toggle']");
-
-    if (button) {
-        button.setAttribute(
-            "aria-expanded",
-            menu.classList.contains("open") ? "true" : "false"
-        );
-    }
-}
-
-
-/* =========================
-   13. SEARCH & SORT
-========================= */
-
-function handleSearch(event) {
-    searchQuery = event.target.value.trim();
-    renderProducts();
-}
-
-function handleSort(event) {
-    sortMode = event.target.value;
-    renderProducts();
-}
-
-
-/* =========================
-   14. EVENT DELEGATION
-========================= */
+/* =========================================================
+   16. GLOBAL CLICK HANDLER
+========================================================= */
 
 document.addEventListener("click", event => {
     const button = event.target.closest("[data-action]");
-
     if (!button) return;
 
     const action = button.dataset.action;
@@ -1636,26 +1483,20 @@ document.addEventListener("click", event => {
             addToCart(id);
             break;
 
-        case "wishlist":
-            toggleWishlist(id);
+        case "toggle-favourite":
+            toggleFavourite(id);
             break;
 
-        case "category":
-            activeCategory = button.dataset.category || "All";
-            renderCategories();
-            renderProducts();
-            break;
-
-        case "quantity-plus":
-            updateCartQuantity(id, 1);
-            break;
-
-        case "quantity-minus":
-            updateCartQuantity(id, -1);
+        case "quantity":
+            updateQuantity(id, Number(button.dataset.change || 0));
             break;
 
         case "remove-cart":
             removeFromCart(id);
+            break;
+
+        case "category":
+            setCategory(button.dataset.category);
             break;
 
         case "open-cart":
@@ -1675,7 +1516,6 @@ document.addEventListener("click", event => {
             break;
 
         case "checkout":
-        case "open-checkout":
             openCheckout();
             break;
 
@@ -1683,236 +1523,119 @@ document.addEventListener("click", event => {
             closeCheckout();
             break;
 
-        case "apply-coupon":
-            applyCoupon();
-            break;
-
-        case "clear-coupon":
-            clearCoupon();
-            break;
-
         case "close-invoice":
             closeInvoice();
             break;
 
-        case "admin-login":
-        case "open-admin":
-            openAdminLogin();
+        case "print-invoice":
+            printInvoice();
             break;
 
-        case "admin-close":
-            closeAdminPanel();
+        case "download-invoice":
+            downloadInvoice();
             break;
 
-        case "admin-delete-product":
-            deleteAdminProduct(id);
+        case "apply-coupon":
+            applyCoupon();
             break;
 
-        case "admin-export":
-            exportOrdersCSV();
-            break;
-
-        case "admin-reset-products":
-            resetDefaultProducts();
-            break;
-
-        case "admin-view-invoice":
-            adminViewInvoice(id);
-            break;
-
-        case "menu-toggle":
-            toggleMobileMenu();
-            break;
-
-        case "clear-search":
-            searchQuery = "";
-
-            const searchInput =
-                $("#search-input") ||
-                $("#product-search") ||
-                $("[data-search]");
-
-            if (searchInput) searchInput.value = "";
-
-            activeCategory = "All";
-            renderCategories();
-            renderProducts();
+        case "delete-product":
+            adminDeleteProduct(id);
             break;
     }
 });
 
-document.addEventListener("submit", event => {
-    if (event.target.id === "checkout-form") {
-        handleCheckout(event);
+/* =========================================================
+   17. OVERLAY, ESCAPE AND FORM LISTENERS
+========================================================= */
+
+function setupModalEvents() {
+    const cartOverlay = $("#cart-overlay");
+    if (cartOverlay) {
+        cartOverlay.addEventListener("click", closeCart);
     }
 
-    if (
-        event.target.id === "admin-login-form" ||
-        event.target.id === "admin-login"
-    ) {
-        handleAdminLogin(event);
+    const wishlistOverlay = $("#wishlist-overlay");
+    if (wishlistOverlay) {
+        wishlistOverlay.addEventListener("click", closeWishlist);
     }
 
-    if (event.target.id === "admin-product-form") {
-        handleAdminProductAdd(event);
+    const checkoutOverlay = $("#checkout-overlay");
+    if (checkoutOverlay) {
+        checkoutOverlay.addEventListener("click", closeCheckout);
     }
-});
 
-document.addEventListener("input", event => {
-    if (
-        event.target.matches("#search-input") ||
-        event.target.matches("#product-search") ||
-        event.target.matches("[data-search]")
-    ) {
-        handleSearch(event);
-    }
-});
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
 
-document.addEventListener("change", event => {
-    if (
-        event.target.matches("#sort-select") ||
-        event.target.matches("[data-sort]")
-    ) {
-        handleSort(event);
-    }
-});
-
-document.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
         closeCart();
         closeWishlist();
         closeCheckout();
         closeInvoice();
-        closeAdminLogin();
-        closeAdminPanel();
-    }
-});
-
-
-/* =========================
-   15. CLICK OUTSIDE MODALS
-========================= */
-
-document.addEventListener("click", event => {
-    const backdropSelectors = [
-        "#cart-drawer",
-        "#wishlist-modal",
-        "#checkout-modal",
-        "#invoice-modal",
-        "#admin-login-modal"
-    ];
-
-    backdropSelectors.forEach(selector => {
-        const element = $(selector);
-
-        if (element && event.target === element) {
-            closeElement(element);
-        }
-    });
-});
-
-
-/* =========================
-   16. SCROLL ANIMATIONS
-========================= */
-
-function initScrollAnimations() {
-    const animated = $$(
-        ".product-card, .feature-card, .section-heading, [data-animate]"
-    );
-
-    if (!("IntersectionObserver" in window)) {
-        animated.forEach(element => {
-            element.style.opacity = "1";
-            element.style.transform = "none";
-        });
-        return;
-    }
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("is-visible");
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.08
     });
 
-    animated.forEach(element => {
-        element.classList.add("reveal");
-        observer.observe(element);
-    });
-}
+    const form = $("#checkout-form");
+    if (form) form.addEventListener("submit", checkoutFormSubmit);
 
-
-/* =========================
-   17. FOOTER YEAR
-========================= */
-
-function setFooterYear() {
-    const yearElement =
-        $("#current-year") ||
-        $("#footer-year") ||
-        $("[data-current-year]");
-
-    if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
+    const couponButton = $(".apply-coupon");
+    if (couponButton && !couponButton.dataset.action) {
+        couponButton.addEventListener("click", applyCoupon);
     }
 }
 
+/* =========================================================
+   18. OPTIONAL GLOBAL HELPERS
+========================================================= */
 
-/* =========================
-   18. INITIALIZE WEBSITE
-========================= */
+window.CraveCart = {
+    getProducts: () => [...products],
+    getCart: () => [...cart],
+    getWishlist: () => [...wishlist],
+    getOrders: () => [...orders],
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    toggleFavourite,
+    renderProducts,
+    renderCart,
+    renderWishlist,
+    adminAddProduct,
+    adminDeleteProduct,
+    adminExportOrdersCSV,
+    openCart,
+    openWishlist,
+    openCheckout,
+    showToast
+};
+
+/* =========================================================
+   19. INITIALISE WEBSITE
+========================================================= */
 
 function initCraveCart() {
     renderCategories();
     renderProducts();
     renderCart();
     renderWishlist();
-    setFooterYear();
+    updateWishlistCount();
 
-    const adminLoginForm = $("#admin-login-form");
+    setupSearch();
+    setupNewsletter();
+    setupGeneralUI();
+    setupModalEvents();
+    setupAdminForms();
 
-    if (adminLoginForm) {
-        adminLoginForm.addEventListener("submit", handleAdminLogin);
+    if (activeCoupon) {
+        updateCouponMessage(`Coupon ${activeCoupon.code} is active.`);
     }
-
-    const checkoutForm = $("#checkout-form");
-
-    if (checkoutForm) {
-        checkoutForm.addEventListener("submit", handleCheckout);
-    }
-
-    const searchInput =
-        $("#search-input") ||
-        $("#product-search") ||
-        $("[data-search]");
-
-    if (searchInput) {
-        searchInput.addEventListener("input", handleSearch);
-    }
-
-    const sortSelect =
-        $("#sort-select") ||
-        $("[data-sort]");
-
-    if (sortSelect) {
-        sortSelect.addEventListener("change", handleSort);
-    }
-
-    initScrollAnimations();
 
     console.log(
-        "%c🍔 CraveCart Loaded Successfully!",
-        "color:#FF6B00;font-size:16px;font-weight:bold"
+        `%c CRAVECART PREMIUM `,
+        "background:#ff6b00;color:#fff;padding:8px;font-weight:bold"
     );
-
-    console.log(
-        "Demo mode: cart, products and orders are saved in this browser."
-    );
+    console.log("Products:", products.length);
+    console.log("Cart items:", cart.length);
+    console.log("CraveCart JavaScript initialised successfully.");
 }
 
 if (document.readyState === "loading") {
@@ -1920,3 +1643,4 @@ if (document.readyState === "loading") {
 } else {
     initCraveCart();
 }
+```
