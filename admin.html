@@ -1,211 +1,1122 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CraveCart Admin</title>
-<link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080808;--card:#151515;--orange:#ff7518;--muted:#aaa;--line:#303030}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#fff;font-family:Poppins,Arial,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer}
-header{padding:17px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
-.logo{font-size:24px;font-weight:800;color:var(--orange)}.logo span{color:white}
-.btn{border:0;border-radius:8px;background:var(--orange);color:#111;font-weight:700;padding:10px 15px}
-.outline{background:transparent;color:white;border:1px solid #555}
-main{padding:25px 5% 60px}
-h1{margin:0 0 6px;font-size:30px}
-.muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px}
-.card small{color:var(--muted)}
-.number{font-size:27px;font-weight:800;color:var(--orange);margin-top:5px;overflow-wrap:anywhere}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
-input,select{padding:11px;background:#111;color:white;border:1px solid #393939;border-radius:8px}
-input{flex:1;min-width:180px}
-.orders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.order{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:17px;min-width:0}
-.orderhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.order h3{margin:0;color:var(--orange);overflow-wrap:anywhere}
-.tag{background:#292929;padding:5px 9px;border-radius:6px;font-size:12px}
-.details{font-size:13px;color:#ddd;line-height:1.8;overflow-wrap:anywhere}
-.items{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 0;margin:12px 0;font-size:13px}
-.row{display:flex;justify-content:space-between;gap:12px;margin:6px 0}
-.total{font-size:19px;color:var(--orange);font-weight:800}
-.statusbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.statusbar select{flex:1;min-width:160px}
-.empty{text-align:center;padding:35px;color:var(--muted);grid-column:1/-1}
-.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.loginbox{width:min(400px,100%);padding:28px;background:var(--card);border:1px solid var(--line);border-radius:16px}
-.loginbox input{width:100%;margin:10px 0}
-.loginbox .btn{width:100%}
-.notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:15px}
-.hidden{display:none!important}
-@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.orders{grid-template-columns:1fr}}
-@media(max-width:500px){header{padding:14px 4%}.logo{font-size:20px}main{padding:20px 4%}h1{font-size:25px}.grid{gap:8px}.card{padding:12px}.number{font-size:22px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>CraveCart | Admin Dashboard</title>
+
+  <link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+
+  <style>
+    /* Fallback styling so the dashboard remains readable before admin.css is added. */
+    :root {
+      color-scheme: dark;
+      --bg: #0b0b0d;
+      --panel: #151518;
+      --panel-light: #1c1c20;
+      --border: #2c2c32;
+      --text: #f6f6f7;
+      --muted: #9999a3;
+      --orange: #ff6b00;
+      --green: #35c98b;
+      --red: #ff5d68;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .admin-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 25px 17px;
+      background: #101012;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 10px;
+      text-decoration: none;
+      color: white;
+    }
+
+    .brand img {
+      width: 43px;
+      height: 43px;
+      border-radius: 13px;
+      object-fit: cover;
+    }
+
+    .brand strong {
+      display: block;
+      font: 700 20px "Space Grotesk", sans-serif;
+    }
+
+    .brand small {
+      color: var(--orange);
+      letter-spacing: 2px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .sidebar-label {
+      padding: 0 12px;
+      color: #777780;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .side-nav {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: transparent;
+      color: #aaaab3;
+      text-align: left;
+      transition: .2s ease;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: white;
+      background: rgba(255, 107, 0, .12);
+      border-color: rgba(255, 107, 0, .24);
+    }
+
+    .nav-item.active { color: var(--orange); }
+
+    .nav-icon {
+      width: 23px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sidebar-note {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .sidebar-note strong { color: var(--orange); }
+
+    .main-area {
+      min-width: 0;
+      padding: 28px clamp(16px, 3vw, 38px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 6px;
+      font: 700 clamp(25px, 3vw, 34px) "Space Grotesk", sans-serif;
+    }
+
+    .subheading {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 15px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--panel-light);
+      color: white;
+      text-decoration: none;
+      transition: transform .2s, background .2s;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button-primary {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .button-primary:hover { background: #e85f00; }
+
+    .button-danger {
+      color: #ff9299;
+      border-color: rgba(255, 93, 104, .3);
+      background: rgba(255, 93, 104, .08);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      padding: 21px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #19191d, #111113);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      right: -25px;
+      top: -35px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 107, 0, .08);
+      filter: blur(5px);
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255, 107, 0, .2);
+      border-radius: 11px;
+      background: rgba(255, 107, 0, .1);
+      color: var(--orange);
+      font-size: 17px;
+    }
+
+    .stat-value {
+      margin: 17px 0 7px;
+      font: 700 clamp(23px, 2.4vw, 32px) "Space Grotesk", sans-serif;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-foot {
+      color: #888891;
+      font-size: 11px;
+    }
+
+    .stat-foot strong { color: var(--green); }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 19px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font: 600 17px "Space Grotesk", sans-serif;
+    }
+
+    .panel-header p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel-body { padding: 20px; }
+
+    .section-view { display: none; }
+    .section-view.active { display: block; animation: fadeIn .25s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .form-field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .form-field.full { grid-column: 1 / -1; }
+
+    .form-field label {
+      color: #c7c7cf;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea,
+    .search-input,
+    .filter-select {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 13px;
+      border: 1px solid #34343b;
+      border-radius: 10px;
+      outline: none;
+      background: #101012;
+      color: white;
+      transition: border-color .2s;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .search-input:focus,
+    .filter-select:focus {
+      border-color: var(--orange);
+    }
+
+    .form-field textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .form-hint {
+      color: #888891;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 19px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-input { min-width: 220px; }
+    .filter-select { width: auto; min-width: 140px; }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th, td {
+      padding: 14px 17px;
+      border-bottom: 1px solid #29292e;
+      font-size: 12px;
+    }
+
+    th {
+      background: #18181c;
+      color: #92929c;
+      font-size: 10px;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    tbody tr:hover { background: rgba(255,255,255,.018); }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 190px;
+    }
+
+    .product-thumb {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      border: 1px solid #35353b;
+      border-radius: 10px;
+      background: #222;
+      object-fit: cover;
+    }
+
+    .product-name {
+      max-width: 210px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+
+    .product-category {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #26262b;
+      color: #c7c7cf;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .badge-success {
+      background: rgba(53, 201, 139, .12);
+      color: #59dba4;
+    }
+
+    .badge-warning {
+      background: rgba(255, 178, 56, .12);
+      color: #ffc45d;
+    }
+
+    .badge-danger {
+      background: rgba(255, 93, 104, .12);
+      color: #ff858e;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #202024;
+      color: #dedee4;
+    }
+
+    .icon-button:hover { border-color: var(--orange); color: var(--orange); }
+
+    .empty-state {
+      padding: 36px 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .empty-state span {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .activity-list { display: grid; }
+
+    .activity-item {
+      display: flex;
+      gap: 11px;
+      padding: 14px 0;
+      border-bottom: 1px solid #29292e;
+    }
+
+    .activity-item:last-child { border-bottom: 0; }
+
+    .activity-dot {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 12px rgba(255, 107, 0, .3);
+    }
+
+    .activity-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .activity-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quick-action {
+      min-height: 90px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: #19191d;
+      color: white;
+      text-align: left;
+      transition: .2s ease;
+    }
+
+    .quick-action:hover {
+      border-color: var(--orange);
+      transform: translateY(-2px);
+    }
+
+    .quick-action span {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 21px;
+    }
+
+    .quick-action strong { font-size: 12px; }
+
+    .notice {
+      padding: 13px 15px;
+      border: 1px solid rgba(255, 178, 56, .25);
+      border-radius: 12px;
+      background: rgba(255, 178, 56, .06);
+      color: #e7c88e;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .toast-container {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 10000;
+      display: grid;
+      gap: 10px;
+      width: min(360px, calc(100vw - 40px));
+    }
+
+    .toast {
+      padding: 14px 16px;
+      border: 1px solid #37373d;
+      border-left: 4px solid var(--orange);
+      border-radius: 12px;
+      background: #1b1b1f;
+      box-shadow: 0 10px 35px #0008;
+      color: white;
+      font-size: 13px;
+      animation: fadeIn .2s ease;
+    }
+
+    .toast.error { border-left-color: var(--red); }
+    .toast.success { border-left-color: var(--green); }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-backdrop.open { display: grid; }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #151518;
+      box-shadow: 0 25px 100px #0009;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font: 600 18px "Space Grotesk", sans-serif;
+    }
+
+    .modal-content { padding: 20px; }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .admin-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        padding: 15px;
+        gap: 15px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar-label, .sidebar-note { display: none; }
+      .side-nav {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 3px;
+      }
+      .nav-item { width: auto; flex: 0 0 auto; padding: 10px 12px; }
+      .sidebar-bottom { display: none; }
+      .main-area { padding: 22px 14px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .top-actions { width: 100%; }
+      .top-actions .button { flex: 1; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-field.full { grid-column: auto; }
+      .search-input { min-width: 0; width: 100%; }
+      .toolbar { width: 100%; }
+      .toolbar > * { flex: 1; }
+    }
+
+    @media (max-width: 420px) {
+      .stats-grid { gap: 9px; }
+      .stat-card { padding: 14px; }
+      .stat-value { font-size: 22px; }
+      .stat-top { font-size: 10px; }
+      .quick-actions { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="admin-shell">
 
-<section id="loginScreen" class="login">
-  <div class="loginbox">
-    <div class="logo">Crave<span>Cart.</span></div>
-    <h2>Admin Login</h2>
-    <p class="muted">Enter your admin password to continue.</p>
-    <form onsubmit="login(event)">
-      <input id="password" type="password" placeholder="Admin password" required autocomplete="current-password">
-      <button class="btn" type="submit">Unlock Dashboard</button>
-    </form>
-    <p id="loginError" style="color:#ff6969;font-size:13px"></p>
-    <p class="notice">Demo security only. A password stored in frontend code can be discovered. Do not use this for a real public store.</p>
-  </div>
-</section>
+    <aside class="sidebar">
+      <a class="brand" href="index.html" aria-label="CraveCart home">
+        <img src="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png" alt="CraveCart logo">
+        <div>
+          <strong>CraveCart</strong>
+          <small>ADMIN STUDIO</small>
+        </div>
+      </a>
 
-<section id="dashboard" class="hidden">
-<header>
-  <div class="logo">Crave<span>Cart.</span> <small style="color:white;font-size:13px">Admin</small></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button class="btn outline" onclick="location.href='index.html'">Open Store</button>
-    <button class="btn" onclick="logout()">Lock Admin</button>
-  </div>
-</header>
-<main>
-  <h1>Order Dashboard</h1>
-  <p class="muted">Manage customer orders and delivery status.</p>
-
-  <div class="grid">
-    <div class="card"><small>Total Orders</small><div class="number" id="totalOrders">0</div></div>
-    <div class="card"><small>Total Order Value</small><div class="number" id="totalValue">₹0</div></div>
-    <div class="card"><small>Delivered</small><div class="number" id="delivered">0</div></div>
-    <div class="card"><small>Pending / Active</small><div class="number" id="active">0</div></div>
-  </div>
-
-  <div class="toolbar">
-    <input id="search" placeholder="Search order ID, name, phone..." oninput="renderOrders()">
-    <select id="filter" onchange="renderOrders()">
-      <option value="">All Statuses</option>
-      <option>Order Placed</option>
-      <option>Confirmed</option>
-      <option>Preparing</option>
-      <option>Out for Delivery</option>
-      <option>Delivered</option>
-      <option>Cancelled</option>
-    </select>
-    <button class="btn" onclick="renderOrders()">Refresh</button>
-  </div>
-
-  <div id="orders" class="orders"></div>
-</main>
-</section>
-
-<script>
-// Change this password before using the demo.
-// Frontend passwords are NOT secure for a public website.
-const ADMIN_PASSWORD = "CraveCart@123";
-const SESSION_KEY = "cc-admin-unlocked";
-
-function login(event) {
-  event.preventDefault();
-  const password=document.getElementById("password").value;
-  if(password===ADMIN_PASSWORD) {
-    // Remember this browser's unlocked state.
-    localStorage.setItem(SESSION_KEY,"yes");
-    showDashboard();
-  } else {
-    document.getElementById("loginError").textContent="Incorrect password. Try again.";
-  }
-}
-function showDashboard() {
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-  renderOrders();
-}
-function logout() {
-  localStorage.removeItem(SESSION_KEY);
-  document.getElementById("password").value="";
-  document.getElementById("dashboard").classList.add("hidden");
-  document.getElementById("loginScreen").classList.remove("hidden");
-}
-function getOrders() {
-  try {
-    const orders=JSON.parse(localStorage.getItem("cc-orders")||"[]");
-    return Array.isArray(orders)?orders:[];
-  } catch(e) { return []; }
-}
-function escapeHTML(s) {
-  return String(s??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-function updateStatus(id,status) {
-  const orders=getOrders();
-  const order=orders.find(o=>o.id===id);
-  if(!order) return alert("Order not found.");
-  order.status=status;
-  localStorage.setItem("cc-orders",JSON.stringify(orders));
-  renderOrders();
-}
-function deleteOrder(id) {
-  if(!confirm("Delete this order permanently from this browser?")) return;
-  const orders=getOrders().filter(o=>o.id!==id);
-  localStorage.setItem("cc-orders",JSON.stringify(orders));
-  renderOrders();
-}
-function renderOrders() {
-  const orders=getOrders();
-  const delivered=orders.filter(o=>o.status==="Delivered").length;
-  const active=orders.filter(o=>!["Delivered","Cancelled"].includes(o.status)).length;
-  document.getElementById("totalOrders").textContent=orders.length;
-  document.getElementById("totalValue").textContent="₹"+orders.reduce((s,o)=>s+Number(o.total||0),0);
-  document.getElementById("delivered").textContent=delivered;
-  document.getElementById("active").textContent=active;
-
-  const q=document.getElementById("search").value.toLowerCase().trim();
-  const status=document.getElementById("filter").value;
-  const filtered=orders.filter(o=>{
-    const match=[o.id,o.name,o.phone,o.address].some(v=>String(v||"").toLowerCase().includes(q));
-    return match&&(!status||o.status===status);
-  });
-
-  document.getElementById("orders").innerHTML=filtered.length?filtered.map(o=>`
-    <article class="order">
-      <div class="orderhead">
-        <h3>${escapeHTML(o.id)}</h3>
-        <span class="tag">${escapeHTML(o.status||"Order Placed")}</span>
+      <div>
+        <div class="sidebar-label">Workspace</div>
+        <nav class="side-nav" aria-label="Admin navigation">
+          <button class="nav-item active" data-section="overview" type="button">
+            <span class="nav-icon">▦</span> Overview
+          </button>
+          <button class="nav-item" data-section="products" type="button">
+            <span class="nav-icon">▣</span> Products
+          </button>
+          <button class="nav-item" data-section="orders" type="button">
+            <span class="nav-icon">▤</span> Orders
+          </button>
+          <button class="nav-item" data-section="add-product" type="button">
+            <span class="nav-icon">＋</span> Add Product
+          </button>
+        </nav>
       </div>
-      <p class="muted" style="font-size:12px">${escapeHTML(o.date||"")}</p>
-      <div class="details">
-        <b>Customer:</b> ${escapeHTML(o.name)}<br>
-        <b>Phone:</b> ${escapeHTML(o.phone)}<br>
-        <b>Address:</b> ${escapeHTML(o.address)}<br>
-        <b>Payment:</b> ${escapeHTML(o.payment||"Cash on Delivery")}
-      </div>
-      <div class="items">
-        ${(Array.isArray(o.items)?o.items:[]).map(p=>`
-          <div class="row"><span>${escapeHTML(p.name)} × ${Number(p.qty)||1}</span>
-          <b>₹${(Number(p.price)||0)*(Number(p.qty)||1)}</b></div>
-        `).join("")}
-        <div class="row"><span>Subtotal</span><span>₹${Number(o.subtotal)||0}</span></div>
-        <div class="row"><span>Delivery</span><span>₹${Number(o.delivery)||0}</span></div>
-        <div class="row"><b>Total</b><b class="total">₹${Number(o.total)||0}</b></div>
-      </div>
-      <div class="statusbar">
-        <select onchange="updateStatus('${escapeHTML(o.id)}',this.value)">
-          ${["Order Placed","Confirmed","Preparing","Out for Delivery","Delivered","Cancelled"].map(s=>
-            `<option ${s===(o.status||"Order Placed")?"selected":""}>${s}</option>`
-          ).join("")}
-        </select>
-        <button class="btn outline" onclick="deleteOrder('${escapeHTML(o.id)}')">Delete</button>
-      </div>
-    </article>
-  `).join(""):`<div class="empty">No orders found. Place a test order on the store first.</div>`;
-}
 
-if(localStorage.getItem(SESSION_KEY)==="yes") showDashboard();
-</script>
+      <div class="sidebar-bottom">
+        <div class="sidebar-label">Store</div>
+        <a class="button" href="index.html">↗ View Store</a>
+        <div class="sidebar-note">
+          <strong>CraveCart Studio</strong><br>
+          Manage your menu, check orders, and keep your store organized.
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Control Center / <span id="current-section-label">Overview</span></div>
+          <h1 id="page-title">Good to see you, Admin.</h1>
+          <p class="subheading" id="page-subtitle">Here's what's happening with your CraveCart store.</p>
+        </div>
+
+        <div class="top-actions">
+          <a href="index.html" class="button">↗ View Store</a>
+          <button class="button button-primary" type="button" id="top-add-product">＋ Add Product</button>
+        </div>
+      </header>
+
+      <!-- OVERVIEW -->
+      <section class="section-view active" id="section-overview">
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Total Products</span>
+              <span class="stat-icon">▣</span>
+            </div>
+            <div class="stat-value" id="stat-products">0</div>
+            <div class="stat-foot">Products in your menu</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Total Orders</span>
+              <span class="stat-icon">▤</span>
+            </div>
+            <div class="stat-value" id="stat-orders">0</div>
+            <div class="stat-foot">Orders saved in this browser</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Total Sales</span>
+              <span class="stat-icon">₹</span>
+            </div>
+            <div class="stat-value" id="stat-sales">₹0</div>
+            <div class="stat-foot">Based on saved order records</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Pending Orders</span>
+              <span class="stat-icon">◷</span>
+            </div>
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-foot">Orders needing attention</div>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Recent Orders</h2>
+                <p>Your latest customer orders</p>
+              </div>
+              <button class="button" type="button" data-go-section="orders">View All →</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-orders-body"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="recent-orders-empty">
+              <span>🧾</span>
+              No orders yet. New orders saved in this browser will appear here.
+            </div>
+          </section>
+
+          <div>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Quick Actions</h2>
+                  <p>Common store tasks</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="quick-actions">
+                  <button class="quick-action" type="button" data-go-section="add-product">
+                    <span>🍔</span><strong>Add Product</strong>
+                  </button>
+                  <button class="quick-action" type="button" data-go-section="products">
+                    <span>📦</span><strong>Manage Menu</strong>
+                  </button>
+                  <button class="quick-action" type="button" data-go-section="orders">
+                    <span>🧾</span><strong>View Orders</strong>
+                  </button>
+                  <button class="quick-action" type="button" id="export-orders">
+                    <span>⬇</span><strong>Export Orders</strong>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Recent Activity</h2>
+                  <p>Updates from your dashboard</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="activity-list" id="activity-list">
+                  <div class="activity-item">
+                    <span class="activity-dot"></span>
+                    <div>
+                      <strong>Admin dashboard ready</strong>
+                      <p>Your local store data will be displayed here.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="notice">
+          <strong>Demo mode:</strong> This static admin panel reads browser localStorage. It does not provide a shared online database, secure staff login, or live payment processing.
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="section-view" id="section-products">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Product Management</h2>
+              <p>Add, edit, search, and remove items from your menu.</p>
+            </div>
+            <button class="button button-primary" type="button" data-go-section="add-product">＋ New Product</button>
+          </div>
+
+          <div class="panel-body">
+            <div class="toolbar">
+              <input class="search-input" id="product-search-admin" type="search" placeholder="Search products..." aria-label="Search products">
+              <select class="filter-select" id="product-category-filter" aria-label="Filter by category">
+                <option value="">All categories</option>
+              </select>
+              <button class="button" type="button" id="refresh-products">↻ Refresh</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Category</th>
+                  <th>Availability</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-body"></tbody>
+            </table>
+          </div>
+          <div class="empty-state hidden" id="products-empty">
+            <span>🍽️</span>
+            No products found. Try a different search or add a product.
+          </div>
+        </section>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="section-view" id="section-orders">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Order Management</h2>
+              <p>Review saved orders and update their status.</p>
+            </div>
+            <button class="button" type="button" id="export-orders-page">⬇ Export CSV</button>
+          </div>
+
+          <div class="panel-body">
+            <div class="toolbar">
+              <input class="search-input" id="order-search" type="search" placeholder="Search order or customer..." aria-label="Search orders">
+              <select class="filter-select" id="order-status-filter" aria-label="Filter by order status">
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="preparing">Preparing</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-body"></tbody>
+            </table>
+          </div>
+          <div class="empty-state hidden" id="orders-empty">
+            <span>📭</span>
+            No matching orders found.
+          </div>
+        </section>
+      </section>
+
+      <!-- ADD / EDIT PRODUCT -->
+      <section class="section-view" id="section-add-product">
+        <div class="content-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 id="product-form-title">Add New Product</h2>
+                <p>Create a menu item for your CraveCart storefront.</p>
+              </div>
+              <span class="badge">MENU EDITOR</span>
+            </div>
+
+            <div class="panel-body">
+              <form id="admin-product-form">
+                <input type="hidden" id="admin-product-id">
+
+                <div class="form-grid">
+                  <div class="form-field full">
+                    <label for="admin-product-name">Product Name *</label>
+                    <input id="admin-product-name" name="name" type="text" maxlength="100" placeholder="e.g. Paneer Tikka Burger" required>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-price">Selling Price (₹) *</label>
+                    <input id="admin-product-price" name="price" type="number" min="1" max="100000" step="1" placeholder="149" required>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-original-price">Original Price (₹)</label>
+                    <input id="admin-product-original-price" name="originalPrice" type="number" min="0" max="100000" step="1" placeholder="179">
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-category">Category *</label>
+                    <select id="admin-product-category" name="category" required>
+                      <option value="">Select category</option>
+                      <option value="Burgers">Burgers</option>
+                      <option value="Pizza">Pizza</option>
+                      <option value="Sandwiches">Sandwiches</option>
+                      <option value="Indian">Indian</option>
+                      <option value="Chinese">Chinese</option>
+                      <option value="Snacks">Snacks</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Beverages">Beverages</option>
+                      <option value="Healthy">Healthy</option>
+                      <option value="Combos">Combos</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-stock">Stock / Quantity</label>
+                    <input id="admin-product-stock" name="stock" type="number" min="0" max="100000" step="1" value="50">
+                  </div>
+
+                  <div class="form-field full">
+                    <label for="admin-product-image">Product Image URL *</label>
+                    <input id="admin-product-image" name="image" type="url" placeholder="https://example.com/food.jpg" required>
+                    <div class="form-hint">Use a publicly accessible image URL. For a real store, use an image service or your own hosted product photos.</div>
+                  </div>
+
+                  <div class="form-field full">
+                    <label for="admin-product-description">Description</label>
+                    <textarea id="admin-product-description" name="description" maxlength="500" placeholder="Describe the taste, ingredients, and serving size..."></textarea>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-badge">Product Badge</label>
+                    <select id="admin-product-badge" name="badge">
+                      <option value="">No badge</option>
+                      <option value="Bestseller">Bestseller</option>
+                      <option value="Popular">Popular</option>
+                      <option value="New">New</option>
+                      <option value="Chef's Special">Chef's Special</option>
+                      <option value="Spicy">Spicy</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="admin-product-vegetarian">Food Type</label>
+                    <select id="admin-product-vegetarian" name="vegetarian">
+                      <option value="true">Vegetarian</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button class="button button-primary" type="submit" id="save-product-button">＋ Save Product</button>
+                  <button class="button" type="button" id="reset-product-form">Clear Form</button>
+                  <button class="button hidden" type="button" id="cancel-edit-product">Cancel Edit</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <div>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Image Preview</h2>
+                  <p>Check the product image before saving.</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <img id="admin-image-preview" src="https://placehold.co/600x400/202024/ff6b00?text=Food+Preview" alt="Product preview" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid var(--border);background:#202024">
+                <h3 id="admin-preview-name" style="margin:16px 0 6px;font-size:17px">Your product name</h3>
+                <p id="admin-preview-description" style="margin-bottom:14px;color:var(--muted);font-size:12px;line-height:1.6">Your product description will appear here.</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                  <strong id="admin-preview-price" style="font-size:23px;color:var(--orange)">₹0</strong>
+                  <span class="badge">VEGETARIAN</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="notice">
+              <strong>Important:</strong> Products are saved in this browser's localStorage. They are not automatically synced to other devices or browsers.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style="padding:20px 0;color:#777780;font-size:11px;text-align:center">
+        © <span id="admin-year"></span> CraveCart Admin Studio · Made for food lovers.
+      </footer>
+    </main>
+  </div>
+
+  <!-- ORDER DETAILS MODAL -->
+  <div class="modal-backdrop" id="order-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="order-modal-title">Order Details</h2>
+        <button class="icon-button" type="button" data-close-order-modal aria-label="Close">✕</button>
+      </div>
+      <div class="modal-content" id="order-modal-content"></div>
+      <div class="modal-footer">
+        <button class="button" type="button" data-close-order-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="admin-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="admin.js" defer></script>
 </body>
 </html>
