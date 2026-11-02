@@ -4,375 +4,421 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CraveCart - Food Ordering</title>
+<title>CraveCart | Veg Food Delivery</title>
 <link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0b0b0b;color:#fff;font-family:Poppins,sans-serif}
-button,input,textarea{font:inherit}
-button{cursor:pointer;border:0}
-header{padding:17px 7%;display:flex;justify-content:space-between;
-align-items:center;background:#111;border-bottom:1px solid #292929;position:sticky;top:0;z-index:5}
-.logo{font-size:25px;font-weight:800;color:#ff7628}
-.logo span{color:white}
-.btn{background:#ff7628;color:white;padding:10px 15px;border-radius:9px;font-weight:600}
-.hero{padding:55px 7%;background:radial-gradient(ellipse at top right,#46200e,#0b0b0b 65%)}
-.hero h1{font-size:clamp(35px,6vw,58px);line-height:1.2}
-.hero h1 span{color:#ff7628}
-.hero p{color:#aaa;margin:15px 0 23px}
-.search{width:100%;max-width:500px;background:#171717;color:white;border:1px solid #333;
-padding:13px;border-radius:9px;outline:none}
-main{padding:30px 7%}
-h2{margin-bottom:18px}
-.categories{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:25px}
-.cat{background:#202020;color:white;padding:9px 15px;border-radius:22px}
-.cat.active,.cat:hover{background:#ff7628}
-.layout{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
-.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.card{background:#171717;border:1px solid #292929;border-radius:13px;overflow:hidden}
-.card img{width:100%;height:145px;object-fit:cover;background:#222}
-.info{padding:12px}
-.info h3{font-size:14px}
-.info small{color:#999}
-.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:5px}
-.price{color:#ff7628;font-weight:700}
-.add{background:#ff7628;color:white;border-radius:7px;padding:7px 10px}
-.cart,.panel{background:#171717;border:1px solid #292929;border-radius:13px;padding:17px}
-.cart{position:sticky;top:85px}
-.cart h2{font-size:21px}
-.cart-item{padding:12px 0;border-bottom:1px solid #333}
-.item-line{display:flex;justify-content:space-between;gap:8px;font-size:13px}
-.remove{color:#ff7777;background:none}
-.qty{display:flex;align-items:center;gap:10px;margin-top:8px}
-.qty button{background:#303030;color:white;width:26px;height:26px;border-radius:5px}
-.total{display:flex;justify-content:space-between;margin:10px 0;font-size:14px}
-.total.final{font-size:18px;font-weight:700;border-top:1px solid #444;padding-top:12px}
-.action{width:100%;padding:11px;border-radius:8px;margin-top:9px;font-weight:600}
-.orange{background:#ff7628;color:white}
-.grey{background:#303030;color:white}
-.empty{color:#999;text-align:center;padding:18px 0;font-size:14px}
-#checkout,#receipt,#history{display:none;margin-top:25px}
-#checkout{max-width:600px}
-input,textarea{width:100%;padding:12px;background:#101010;color:white;border:1px solid #393939;
-border-radius:8px;margin:7px 0 14px}
-label{font-size:13px;color:#ccc}
-.receipt{background:white;color:#171717;padding:25px;border-radius:5px;max-width:600px}
-.receipt h2,.receipt p{text-align:center}
-.receipt h2{color:#e86619;margin:5px 0}
-.receipt hr{border:0;border-top:1px dashed #888;margin:12px 0}
-.bill-row{display:flex;justify-content:space-between;gap:12px;margin:8px 0;font-size:13px}
-.receipt table{width:100%;border-collapse:collapse;margin:15px 0;font-size:12px}
-.receipt th,.receipt td{text-align:left;padding:7px 3px;border-bottom:1px solid #ddd}
-.receipt th:last-child,.receipt td:last-child{text-align:right}
-footer{text-align:center;color:#777;padding:25px;border-top:1px solid #292929;margin-top:30px}
-#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-background:#ff7628;padding:12px 20px;border-radius:8px;z-index:10}
-@media(max-width:1000px){.layout{grid-template-columns:1fr}.cart{position:static}
-.products{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){header{padding:14px 5%}.hero,main{padding:25px 5%}
-.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.card img{height:115px}.info{padding:9px}.info h3{font-size:12px}}
-@media print{
-body{background:white;color:black}
-header,.hero,main,footer,#toast,.no-print{display:none!important}
-#receipt{display:block!important;margin:0!important}
-.receipt{max-width:none;width:100%;border:0}
-}
+:root{--bg:#080808;--card:#141414;--orange:#ff7518;--muted:#aaa;--line:#292929}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:Poppins,Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:#080808ed;border-bottom:1px solid var(--line);padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.logo{font-size:25px;font-weight:800;color:var(--orange)}.logo span{color:white}
+.btn{background:var(--orange);color:#111;border:0;border-radius:9px;padding:11px 16px;font-weight:700}
+.btn:hover{filter:brightness(1.12)}.outline{background:transparent;color:white;border:1px solid #555}
+.hero{padding:45px 5%;background:radial-gradient(ellipse at 80% 30%,#5a230d66,transparent 50%)}
+.hero h1{font-size:clamp(30px,5vw,55px);line-height:1.15;margin:0 0 12px}
+.hero h1 span{color:var(--orange)}.muted{color:var(--muted)}
+main{padding:15px 5% 60px}
+.searchbox{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin:12px 0 20px}
+input,select,textarea{width:100%;padding:12px;background:#101010;color:white;border:1px solid #383838;border-radius:9px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+.categories{display:flex;gap:9px;overflow:auto;padding:8px 0 18px}
+.chip{white-space:nowrap;background:#171717;border:1px solid #333;color:white;padding:9px 14px;border-radius:30px}
+.chip.active,.chip:hover{background:var(--orange);color:#111;border-color:var(--orange)}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
+.product{background:var(--card);border:1px solid #242424;border-radius:14px;overflow:hidden;transition:.2s}
+.product:hover{transform:translateY(-3px);border-color:#71340f}
+.product img{width:100%;height:165px;object-fit:cover;background:#222}
+.pbody{padding:13px}.pbody h3{font-size:15px;margin:0 0 6px}
+.pbody p{font-size:12px;color:var(--muted);min-height:32px;margin:5px 0}
+.price{color:var(--orange);font-weight:800;font-size:18px}
+.pfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.add{padding:8px 11px;border:0;border-radius:8px;background:var(--orange);font-weight:700}
+.cartbar{position:fixed;bottom:15px;right:15px;z-index:6;box-shadow:0 4px 25px #000;background:var(--orange);color:#111;border:0;border-radius:30px;padding:15px 20px;font-weight:800}
+.empty{padding:40px;text-align:center;color:var(--muted);grid-column:1/-1}
+footer{text-align:center;padding:25px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+/* Popup */
+.modal{display:none;position:fixed;inset:0;z-index:10;background:#000d;overflow:auto;padding:20px}
+.modal.show{display:flex;align-items:center;justify-content:center}
+.dialog{background:#111;border:1px solid #393939;border-radius:16px;width:min(720px,100%);padding:22px;margin:auto;max-height:92vh;overflow:auto}
+.dialog h2{margin:0 0 8px}.closex{float:right;background:#282828;color:white;border:0;border-radius:8px;padding:8px 12px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.full{grid-column:1/-1}.label{display:block;font-size:12px;color:#bbb;margin:0 0 5px}
+.addresschoice{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.addresschoice label{border:1px solid #444;padding:10px;border-radius:8px;cursor:pointer}
+.bill{border:1px dashed #777;padding:16px;margin-top:15px;background:#171717}
+.billrow{display:flex;justify-content:space-between;gap:15px;padding:7px 0;border-bottom:1px solid #333;font-size:13px}
+.billtotal{font-size:20px;color:var(--orange);font-weight:800}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.bottomclose{width:100%;margin-top:18px;background:#282828;color:white;border:1px solid #444;border-radius:9px;padding:12px}
+@media(max-width:900px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.searchbox{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){header{padding:12px 4%}.logo{font-size:20px}.hero{padding:35px 5%}main{padding:12px 4%}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product img{height:125px}.pbody{padding:10px}.pbody h3{font-size:13px}.pfoot{align-items:flex-start;flex-direction:column}.searchbox{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.dialog{padding:16px}}
 </style>
 </head>
-
 <body>
 <header>
   <div class="logo">Crave<span>Cart.</span></div>
-  <button class="btn" onclick="goCart()">🛒 Cart (<span id="count">0</span>)</button>
+  <button class="btn" onclick="openCheckout()">🛒 Cart (<span id="cartCount">0</span>)</button>
 </header>
 
 <section class="hero">
-  <h1>Good food.<br><span>Good mood.</span></h1>
-  <p>Your cravings, delivered one delicious bite at a time.</p>
-  <input class="search" id="search" placeholder="🔍 Search food..." oninput="showFoods()">
+  <p style="color:var(--orange);font-weight:700">FRESH • TASTY • VEGETARIAN</p>
+  <h1>Your cravings,<br><span>delivered fresh.</span></h1>
+  <p class="muted">Explore delicious vegetarian food for every mood.</p>
+  <button class="btn" onclick="document.getElementById('search').focus()">Explore Menu ↓</button>
 </section>
 
 <main>
-  <h2>Explore Our Menu 🍽️</h2>
-  <div class="categories" id="categories"></div>
-
-  <div class="layout">
-    <div class="products" id="products"></div>
-
-    <aside class="cart" id="cart">
-      <h2>Your Cart 🛒</h2>
-      <div id="cartItems"></div>
-      <div class="total"><span>Subtotal</span><span id="subtotal">₹0</span></div>
-      <div class="total"><span>Delivery</span><span id="delivery">₹0</span></div>
-      <div class="total final"><span>Total</span><span id="total">₹0</span></div>
-      <button class="action orange" onclick="openCheckout()">Checkout</button>
-      <button class="action grey" onclick="clearCart()">Clear Cart</button>
-      <button class="action grey" onclick="showHistory()">My Demo Orders</button>
-    </aside>
+  <div class="sectionhead">
+    <h2>Explore Menu</h2>
+    <span class="muted" id="resultCount"></span>
   </div>
-
-  <section id="checkout" class="panel">
-    <h2>Delivery Details</h2>
-    <form id="orderForm">
-      <label>Customer Name</label>
-      <input id="customer" required maxlength="80" placeholder="Enter your name">
-      <label>Mobile Number</label>
-      <input id="phone" required type="tel" pattern="[0-9]{10}" maxlength="10"
-      placeholder="10-digit mobile number">
-      <label>Delivery Address</label>
-      <textarea id="address" required maxlength="300" rows="3"
-      placeholder="House number, street, city"></textarea>
-      <p class="total"><span>Payable Amount (COD)</span><b id="payable">₹0</b></p>
-      <button class="action orange" type="submit">Place Order & Generate Bill</button>
-      <button class="action grey" type="button" onclick="closeCheckout()">Cancel</button>
-    </form>
-  </section>
-
-  <section id="receipt">
-    <div class="receipt" id="bill"></div>
-    <button class="action orange no-print" onclick="window.print()">🖨️ Print Bill / Save PDF</button>
-    <button class="action grey no-print" onclick="backToMenu()">Back to Menu</button>
-  </section>
-
-  <section id="history" class="panel">
-    <h2>My Demo Orders</h2>
-    <p style="color:#aaa;font-size:13px;margin-bottom:15px">
-      This order history is saved only in this browser.
-    </p>
-    <div id="orders"></div>
-    <button class="action grey" onclick="hideHistory()">Close History</button>
-  </section>
+  <div class="searchbox">
+    <input id="search" placeholder="🔎 Search food..." oninput="renderProducts()">
+    <select id="category" onchange="renderProducts()"><option value="">All Categories</option></select>
+    <select id="sort" onchange="renderProducts()">
+      <option value="default">Sort: Recommended</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+      <option value="az">Name: A to Z</option>
+    </select>
+    <select id="priceFilter" onchange="renderProducts()">
+      <option value="all">Any Price</option>
+      <option value="100">Under ₹100</option>
+      <option value="200">Under ₹200</option>
+      <option value="300">Under ₹300</option>
+      <option value="500">Under ₹500</option>
+    </select>
+  </div>
+  <div class="categories" id="chips"></div>
+  <div class="products" id="products"></div>
 </main>
 
-<footer>© 2026 CraveCart | Made with ❤️ for food lovers</footer>
-<div id="toast"></div>
+<button class="cartbar" onclick="openCheckout()">🛒 View Cart · ₹<span id="cartTotal">0</span></button>
+<footer>© 2026 CraveCart · Made with ❤️ for food lovers · Vegetarian Menu</footer>
+
+<!-- Cart and checkout popup -->
+<div class="modal" id="checkoutModal">
+  <div class="dialog">
+    <button class="closex" onclick="closeCheckout()">✕</button>
+    <h2>🛒 Your Order</h2>
+    <p class="muted">Review your cart and enter delivery details.</p>
+    <div id="cartItems"></div>
+    <div id="checkoutForm">
+      <h3>Delivery Details</h3>
+      <div class="formgrid">
+        <div><label class="label">Full Name</label><input id="customerName" placeholder="Your name"></div>
+        <div><label class="label">Mobile Number</label><input id="customerPhone" inputmode="numeric" maxlength="10" placeholder="10-digit mobile"></div>
+        <div class="full">
+          <label class="label">Choose Address</label>
+          <div class="addresschoice">
+            <label><input type="radio" name="addressMode" value="same" checked onchange="addressModeChanged()" style="width:auto"> Same Address</label>
+            <label><input type="radio" name="addressMode" value="new" onchange="addressModeChanged()" style="width:auto"> New Address</label>
+          </div>
+          <div id="savedAddressBox" class="muted"></div>
+          <textarea id="address" rows="3" placeholder="House number, street, area, city, PIN code"></textarea>
+        </div>
+        <div class="full">
+          <label class="label">Payment Method</label>
+          <input value="Cash on Delivery (COD)" readonly>
+        </div>
+      </div>
+      <button class="btn" style="width:100%" onclick="placeOrder()">Place Order · ₹<span id="checkoutTotal">0</span></button>
+    </div>
+    <div id="billArea"></div>
+    <button class="bottomclose" onclick="closeCheckout()">Close Popup</button>
+  </div>
+</div>
 
 <script>
-// 1. MENU DATA: 30 PRODUCTS
-const foods=[
-{id:1,name:"Chicken Biryani",price:229,cat:"Indian",img:"photo-1563379091339-03246963d96c"},
-{id:2,name:"Paneer Butter Masala",price:199,cat:"Indian",img:"photo-1631452180519-c014fe946bc7"},
-{id:3,name:"Masala Dosa",price:99,cat:"Indian",img:"photo-1589301760014-d929f3979dbc"},
-{id:4,name:"Chole Bhature",price:129,cat:"Indian",img:"photo-1626132647523-66f5bf380027"},
-{id:5,name:"Veg Thali",price:179,cat:"Indian",img:"photo-1546833999-b9f581a1996d"},
-{id:6,name:"Samosa",price:30,cat:"Snacks",img:"photo-1601050690597-df0568f70950"},
-{id:7,name:"Spring Rolls",price:119,cat:"Snacks",img:"photo-1544025162-d76694265947"},
-{id:8,name:"French Fries",price:89,cat:"Snacks",img:"photo-1573080496219-bb080dd4f877"},
-{id:9,name:"Veg Sandwich",price:99,cat:"Snacks",img:"photo-1528735602780-2552fd46c7af"},
-{id:10,name:"Margherita Pizza",price:179,cat:"Pizza",img:"photo-1579751626657-72bc17010498"},
-{id:11,name:"Farmhouse Pizza",price:249,cat:"Pizza",img:"photo-1513104890138-7c749659a591"},
-{id:12,name:"Cheese Burst Pizza",price:279,cat:"Pizza",img:"photo-1571407970349-bc81e7e96d47"},
-{id:13,name:"Classic Burger",price:129,cat:"Burger",img:"photo-1568901346375-23c9450c58cd"},
-{id:14,name:"Double Cheese Burger",price:189,cat:"Burger",img:"photo-1553979459-d2229ba7433a"},
-{id:15,name:"Chicken Burger",price:179,cat:"Burger",img:"photo-1571091718767-18b5b1457add"},
-{id:16,name:"White Sauce Pasta",price:169,cat:"Pasta",img:"photo-1473093295043-cdd812d0e601"},
-{id:17,name:"Red Sauce Pasta",price:159,cat:"Pasta",img:"photo-1551183053-bf91a1d81141"},
-{id:18,name:"Chocolate Brownie",price:99,cat:"Dessert",img:"photo-1606313564200-e75d5e30476c"},
-{id:19,name:"Chocolate Cake",price:129,cat:"Dessert",img:"photo-1578985545062-69928b1d9587"},
-{id:20,name:"Vanilla Ice Cream",price:79,cat:"Dessert",img:"photo-1563805042-7684c019e1cb"},
-{id:21,name:"Chocolate Milkshake",price:119,cat:"Drinks",img:"photo-1572490122747-3968b75cc699"},
-{id:22,name:"Cold Coffee",price:99,cat:"Drinks",img:"photo-1461023058943-07fcbe16d735"},
-{id:23,name:"Fresh Lemonade",price:59,cat:"Drinks",img:"photo-1513558161293-cdaf765edfd4"},
-{id:24,name:"Mango Smoothie",price:129,cat:"Drinks",img:"photo-1505252585461-04db1eb84625"},
-{id:25,name:"Chicken Momos",price:139,cat:"Snacks",img:"photo-1563245372-f21724e3856d"},
-{id:26,name:"Hakka Noodles",price:149,cat:"Chinese",img:"photo-1585032226651-759b368d7246"},
-{id:27,name:"Veg Fried Rice",price:139,cat:"Chinese",img:"photo-1603133872878-684f208fb84b"},
-{id:28,name:"Manchurian",price:149,cat:"Chinese",img:"photo-1512058564366-18510be2db19"},
-{id:29,name:"Grilled Cheese Sandwich",price:119,cat:"Snacks",img:"photo-1528735602780-2552fd46c7af"},
-{id:30,name:"Strawberry Shake",price:119,cat:"Drinks",img:"photo-1553530666-ba11a7da3888"}
-].map(f=>({...f,img:"https://images.unsplash.com/"+f.img+"?auto=format&fit=crop&w=600&q=80"}));
+const categories = {
+ "Pizza":["Margherita Pizza","Farmhouse Pizza","Paneer Tikka Pizza","Corn Cheese Pizza","Veggie Supreme","Onion Capsicum Pizza","Cheese Burst Pizza","Mushroom Pizza","Peri Peri Pizza","Tandoori Paneer Pizza"],
+ "Burger":["Classic Veg Burger","Aloo Tikki Burger","Paneer Burger","Crispy Veg Burger","Cheese Burger","Double Patty Burger","Mexican Veg Burger","Mushroom Burger","Spicy Bean Burger","Corn Cheese Burger"],
+ "Indian":["Paneer Butter Masala","Shahi Paneer","Kadai Paneer","Palak Paneer","Chole Masala","Dal Makhani","Mix Veg Curry","Malai Kofta","Aloo Gobi","Rajma Masala"],
+ "Rice & Biryani":["Veg Biryani","Paneer Biryani","Jeera Rice","Veg Fried Rice","Schezwan Rice","Lemon Rice","Curd Rice","Peas Pulao","Mushroom Biryani","Tawa Pulao"],
+ "South Indian":["Masala Dosa","Plain Dosa","Mysore Masala Dosa","Rava Dosa","Idli Sambar","Medu Vada","Uttapam","Onion Uttapam","Paneer Dosa","Cheese Dosa"],
+ "Chinese":["Veg Hakka Noodles","Schezwan Noodles","Chilli Paneer","Veg Manchurian","Crispy Corn","Spring Rolls","Chilli Potato","Honey Chilli Potato","Veg Momos","Paneer Momos"],
+ "Sandwich & Wrap":["Veg Grilled Sandwich","Cheese Sandwich","Paneer Sandwich","Corn Sandwich","Aloo Wrap","Paneer Tikka Wrap","Mexican Wrap","Club Veg Sandwich","Mushroom Sandwich","Cheese Toast"],
+ "Snacks":["French Fries","Peri Peri Fries","Cheese Balls","Veg Cutlet","Samosa (2 pcs)","Paneer Pakora","Onion Rings","Garlic Bread","Cheese Garlic Bread","Masala Maggi"],
+ "Desserts":["Gulab Jamun","Rasgulla","Chocolate Brownie","Chocolate Cake","Vanilla Ice Cream","Chocolate Ice Cream","Kulfi","Rasmalai","Cheesecake","Choco Lava Cake"],
+ "Drinks":["Masala Chai","Cold Coffee","Mango Shake","Chocolate Shake","Fresh Lime Soda","Sweet Lassi","Mango Lassi","Iced Tea","Hot Coffee","Mineral Water"]
+};
 
-// 2. SAVE CART AND ORDERS IN THIS BROWSER
-function readData(key,fallback){
-  try{return JSON.parse(localStorage.getItem(key))||fallback}
-  catch{return fallback}
+const prices = {
+ "Pizza":150,"Burger":80,"Indian":160,"Rice & Biryani":130,
+ "South Indian":70,"Chinese":100,"Sandwich & Wrap":75,
+ "Snacks":50,"Desserts":60,"Drinks":30
+};
+const descriptions = {
+ "Pizza":"Freshly baked with delicious toppings.",
+ "Burger":"A tasty vegetarian burger made fresh.",
+ "Indian":"Classic Indian flavours and spices.",
+ "Rice & Biryani":"Aromatic rice prepared with flavourful spices.",
+ "South Indian":"Fresh South Indian favourite.",
+ "Chinese":"Delicious Indo-Chinese vegetarian food.",
+ "Sandwich & Wrap":"Fresh, filling and full of flavour.",
+ "Snacks":"A perfect snack for any time.",
+ "Desserts":"A sweet treat to complete your meal.",
+ "Drinks":"A refreshing drink for your day."
+};
+
+// Build 100 vegetarian products from 10 categories.
+const products = [];
+let nextId = 1;
+Object.entries(categories).forEach(([category,names], groupIndex) => {
+  names.forEach((name,index) => {
+    const price = prices[category] + (index * 17 % 90);
+    products.push({
+      id:nextId++, name, category, price,
+      description:descriptions[category],
+      imageIndex:(groupIndex * 3 + index) % 8
+    });
+  });
+});
+
+const foodPhotos = [
+ "photo-1513104890138-7c749659a591",
+ "photo-1568901346375-23c9450c58cd",
+ "photo-1546069901-ba9599a7e63c",
+ "photo-1540189549336-e6e99c3679fe",
+ "photo-1565299624946-b28f40a0ae38",
+ "photo-1512621776951-a57141f2eefd",
+ "photo-1547592180-85f173990554",
+ "photo-1473093295043-cdd812d0e601"
+];
+function foodImage(p) {
+  return "https://images.unsplash.com/" + foodPhotos[p.imageIndex] +
+  "?auto=format&fit=crop&w=600&q=75";
 }
-let cart=readData("cc-cart",{});
-let orders=readData("cc-orders",[]);
-let category="All";
 
-function saveCart(){
+let cart = JSON.parse(localStorage.getItem("cc-cart") || "[]");
+let activeCategory = "";
+let lastOrder = null;
+
+const categorySelect = document.getElementById("category");
+Object.keys(categories).forEach(c => {
+  categorySelect.add(new Option(c,c));
+});
+
+document.getElementById("chips").innerHTML =
+  `<button class="chip active" onclick="setCategory('',this)">All Food</button>` +
+  Object.keys(categories).map(c =>
+    `<button class="chip" onclick="setCategory('${c}',this)">${c}</button>`
+  ).join("");
+
+function setCategory(category,button) {
+  activeCategory = category;
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+  button.classList.add("active");
+  categorySelect.value = category;
+  renderProducts();
+}
+
+function renderProducts() {
+  const query = document.getElementById("search").value.toLowerCase().trim();
+  const category = categorySelect.value || activeCategory;
+  const priceMax = document.getElementById("priceFilter").value;
+  let list = products.filter(p =>
+    (p.name.toLowerCase().includes(query) ||
+     p.category.toLowerCase().includes(query) ||
+     p.description.toLowerCase().includes(query)) &&
+    (!category || p.category === category) &&
+    (priceMax === "all" || p.price < Number(priceMax))
+  );
+
+  const sort = document.getElementById("sort").value;
+  if(sort==="low") list.sort((a,b)=>a.price-b.price);
+  if(sort==="high") list.sort((a,b)=>b.price-a.price);
+  if(sort==="az") list.sort((a,b)=>a.name.localeCompare(b.name));
+
+  document.getElementById("resultCount").textContent =
+    `${list.length} vegetarian items`;
+  document.getElementById("products").innerHTML = list.length ? list.map(p=>`
+    <article class="product">
+      <img src="${foodImage(p)}" alt="${p.name}" loading="lazy">
+      <div class="pbody">
+        <h3>${p.name}</h3>
+        <span class="muted" style="font-size:11px">${p.category} · 🟢 Veg</span>
+        <p>${p.description}</p>
+        <div class="pfoot">
+          <span class="price">₹${p.price}</span>
+          <button class="add" onclick="addToCart(${p.id})">+ Add</button>
+        </div>
+      </div>
+    </article>`).join("") :
+    `<div class="empty">No items found. Try another search.</div>`;
+}
+
+function saveCart() {
   localStorage.setItem("cc-cart",JSON.stringify(cart));
   updateCart();
 }
-
-// 3. CATEGORY BUTTONS
-function showCategories(){
-  let cats=["All",...new Set(foods.map(f=>f.cat))];
-  document.getElementById("categories").innerHTML=cats.map(c=>
-    `<button class="cat ${category===c?"active":""}"
-    onclick="setCategory('${c}')">${c}</button>`).join("");
-}
-function setCategory(c){
-  category=c;
-  showCategories();
-  showFoods();
-}
-
-// 4. DISPLAY PRODUCTS AND SEARCH
-function showFoods(){
-  let q=document.getElementById("search").value.toLowerCase();
-  let list=foods.filter(f=>(category==="All"||f.cat===category)&&
-  f.name.toLowerCase().includes(q));
-
-  document.getElementById("products").innerHTML=list.length?list.map(f=>`
-  <article class="card">
-    <img src="${f.img}" alt="${f.name}" loading="lazy">
-    <div class="info"><h3>${f.name}</h3><small>${f.cat}</small>
-      <div class="price-row"><span class="price">₹${f.price}</span>
-      <button class="add" onclick="addToCart(${f.id})">+ Add</button></div>
-    </div>
-  </article>`).join(""):"<p>No food found.</p>";
-}
-
-// 5. CART FUNCTIONS
-function addToCart(id){
-  cart[id]=(cart[id]||0)+1;
-  saveCart();
-  toast("Added to cart!");
-}
-function changeQty(id,n){
-  cart[id]=(cart[id]||0)+n;
-  if(cart[id]<=0)delete cart[id];
+function addToCart(id) {
+  const item = cart.find(x=>x.id===id);
+  if(item) item.qty++;
+  else cart.push({id,qty:1});
   saveCart();
 }
-function clearCart(){
-  cart={};
+function changeQty(id,change) {
+  const item = cart.find(x=>x.id===id);
+  if(!item) return;
+  item.qty += change;
+  if(item.qty<=0) cart=cart.filter(x=>x.id!==id);
   saveCart();
-  toast("Cart cleared!");
+  renderCart();
 }
-function getItems(){
-  return foods.filter(f=>Number(cart[f.id])>0);
+function cartDetails() {
+  return cart.map(item=>{
+    const p=products.find(x=>x.id===item.id);
+    return p ? {...p,qty:item.qty} : null;
+  }).filter(Boolean);
 }
-function getTotals(){
-  let subtotal=getItems().reduce((s,f)=>s+f.price*Number(cart[f.id]),0);
-  let delivery=subtotal===0||subtotal>=499?0:40;
-  return{subtotal,delivery,total:subtotal+delivery};
+function subtotal() {
+  return cartDetails().reduce((sum,p)=>sum+p.price*p.qty,0);
 }
-function updateCart(){
-  let items=getItems(),count=0;
-  document.getElementById("cartItems").innerHTML=items.length?items.map(f=>{
-    let q=Number(cart[f.id]);count+=q;
-    return `<div class="cart-item">
-      <div class="item-line"><b>${f.name}</b>
-      <button class="remove" onclick="changeQty(${f.id},-${q})">Remove</button></div>
-      <div class="item-line" style="margin-top:8px"><span>₹${f.price*q}</span>
-        <div class="qty"><button onclick="changeQty(${f.id},-1)">−</button>
-        <span>${q}</span><button onclick="changeQty(${f.id},1)">+</button></div>
-      </div></div>`;
-  }).join(""):'<div class="empty">Your cart is empty 🛒</div>';
+function deliveryFee() {
+  return subtotal()===0 || subtotal()>=499 ? 0 : 40;
+}
+function total() {
+  return subtotal()+deliveryFee();
+}
+function updateCart() {
+  const count=cart.reduce((s,x)=>s+x.qty,0);
+  document.getElementById("cartCount").textContent=count;
+  document.getElementById("cartTotal").textContent=total();
+  document.getElementById("checkoutTotal").textContent=total();
+}
+function openCheckout() {
+  document.getElementById("checkoutModal").classList.add("show");
+  document.getElementById("billArea").innerHTML="";
+  document.getElementById("checkoutForm").style.display="block";
+  renderCart();
+  loadAddress();
+}
+function closeCheckout() {
+  document.getElementById("checkoutModal").classList.remove("show");
+}
+function renderCart() {
+  const details=cartDetails();
+  document.getElementById("cartItems").innerHTML=details.length ?
+    details.map(p=>`
+      <div class="billrow">
+        <span>${p.name}<br><small class="muted">₹${p.price} × ${p.qty}</small></span>
+        <span>₹${p.price*p.qty}
+          <br><button class="outline" onclick="changeQty(${p.id},-1)">−</button>
+          <button class="outline" onclick="changeQty(${p.id},1)">+</button>
+        </span>
+      </div>`).join("")+
+      `<div class="billrow"><span>Subtotal</span><b>₹${subtotal()}</b></div>
+       <div class="billrow"><span>Delivery</span><b>${deliveryFee()===0?"FREE":"₹"+deliveryFee()}</b></div>
+       <div class="billrow"><b>Total</b><b class="billtotal">₹${total()}</b></div>` :
+      `<p class="empty">Your cart is empty. Add some vegetarian food first!</p>`;
+  updateCart();
+}
+function loadAddress() {
+  const saved=JSON.parse(localStorage.getItem("cc-address")||"null");
+  document.getElementById("savedAddressBox").textContent =
+    saved ? "Saved address: "+saved : "No saved address yet.";
+  document.getElementById("address").value=saved||"";
+  document.querySelector('input[name="addressMode"][value="same"]').checked=true;
+  document.getElementById("address").readOnly=!!saved;
+}
+function addressModeChanged() {
+  const mode=document.querySelector('input[name="addressMode"]:checked').value;
+  const saved=localStorage.getItem("cc-address");
+  const field=document.getElementById("address");
+  field.readOnly=mode==="same" && !!saved;
+  if(mode==="same") field.value=saved||"";
+  else field.value="";
+  field.placeholder=mode==="same"?"Your saved address":"Enter your new delivery address";
+}
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
 
-  let t=getTotals();
-  document.getElementById("count").textContent=count;
-  document.getElementById("subtotal").textContent="₹"+t.subtotal;
-  document.getElementById("delivery").textContent=t.delivery?"₹"+t.delivery:"FREE";
-  document.getElementById("total").textContent="₹"+t.total;
-  document.getElementById("payable").textContent="₹"+t.total;
-}
+function placeOrder() {
+  const details=cartDetails();
+  const name=document.getElementById("customerName").value.trim();
+  const phone=document.getElementById("customerPhone").value.trim();
+  const address=document.getElementById("address").value.trim();
+  if(!details.length) return alert("Please add food to your cart.");
+  if(!name) return alert("Please enter your name.");
+  if(!/^[0-9]{10}$/.test(phone)) return alert("Enter a valid 10-digit mobile number.");
+  if(address.length<8) return alert("Please enter your complete address.");
 
-// 6. CHECKOUT FORM
-function openCheckout(){
-  if(!getItems().length){toast("Please add food first!");return}
-  document.getElementById("checkout").style.display="block";
-  document.getElementById("history").style.display="none";
-  document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
-  document.getElementById("payable").textContent="₹"+getTotals().total;
-}
-function closeCheckout(){
-  document.getElementById("checkout").style.display="none";
-}
-document.getElementById("orderForm").addEventListener("submit",function(e){
-  e.preventDefault();
-  if(!getItems().length){toast("Your cart is empty!");return}
-
-  let t=getTotals();
-  let order={
+  localStorage.setItem("cc-address",address);
+  const order={
     id:"CC"+Date.now().toString().slice(-8),
     date:new Date().toLocaleString(),
-    customer:document.getElementById("customer").value.trim(),
-    phone:document.getElementById("phone").value.trim(),
-    address:document.getElementById("address").value.trim(),
-    items:getItems().map(f=>({name:f.name,price:f.price,qty:Number(cart[f.id])})),
-    subtotal:t.subtotal,delivery:t.delivery,total:t.total,
-    status:"Order Placed",payment:"Cash on Delivery"
+    name,phone,address,payment:"Cash on Delivery",
+    status:"Order Placed",
+    items:details.map(p=>({id:p.id,name:p.name,price:p.price,qty:p.qty})),
+    subtotal:subtotal(),delivery:deliveryFee(),total:total()
   };
-  if(!order.customer||!order.phone||!order.address){toast("Fill all details!");return}
-
+  const orders=JSON.parse(localStorage.getItem("cc-orders")||"[]");
   orders.unshift(order);
   localStorage.setItem("cc-orders",JSON.stringify(orders));
-  makeBill(order);
-  cart={};
+  lastOrder=order;
+  cart=[];
   saveCart();
-  closeCheckout();
-  document.getElementById("receipt").style.display="block";
-  document.getElementById("receipt").scrollIntoView({behavior:"smooth"});
-  toast("Order placed! Bill generated.");
-});
-
-// 7. GENERATE PRINTABLE BILL
-function safe(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function makeBill(o){
-  let rows=o.items.map(i=>`<tr><td>${safe(i.name)}</td>
-    <td>${i.qty}</td><td>₹${i.price}</td><td>₹${i.price*i.qty}</td></tr>`).join("");
-  document.getElementById("bill").innerHTML=`
-    <h2>CraveCart</h2><p>Food Order Receipt</p><hr>
-    <div class="bill-row"><b>Order ID</b><span>${safe(o.id)}</span></div>
-    <div class="bill-row"><b>Date</b><span>${safe(o.date)}</span></div>
-    <div class="bill-row"><b>Customer</b><span>${safe(o.customer)}</span></div>
-    <div class="bill-row"><b>Mobile</b><span>${safe(o.phone)}</span></div>
-    <div class="bill-row"><b>Address</b><span>${safe(o.address)}</span></div><hr>
-    <table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-    <tbody>${rows}</tbody></table><hr>
-    <div class="bill-row"><span>Subtotal</span><b>₹${o.subtotal}</b></div>
-    <div class="bill-row"><span>Delivery</span><b>${o.delivery?"₹"+o.delivery:"FREE"}</b></div>
-    <div class="bill-row"><b>Grand Total</b><b>₹${o.total}</b></div>
-    <div class="bill-row"><span>Payment</span><b>${safe(o.payment)}</b></div>
-    <div class="bill-row"><span>Order Status</span><b>${safe(o.status)}</b></div>
-    <hr><p>Thank you for ordering with CraveCart!</p>
-    <p style="font-size:10px;margin-top:8px">Demo receipt — not a tax invoice.</p>`;
-}
-function backToMenu(){
-  document.getElementById("receipt").style.display="none";
-  document.querySelector(".hero").scrollIntoView({behavior:"smooth"});
+  renderCart();
+  document.getElementById("checkoutForm").style.display="none";
+  document.getElementById("billArea").innerHTML=makeBill(order);
 }
 
-// 8. ORDER HISTORY
-function showHistory(){
-  document.getElementById("history").style.display="block";
-  document.getElementById("checkout").style.display="none";
-  document.getElementById("receipt").style.display="none";
-  document.getElementById("orders").innerHTML=orders.length?orders.map(o=>`
-    <div class="cart-item">
-      <b>${safe(o.id)}</b> — ₹${o.total}<br>
-      <small>${safe(o.date)} | ${safe(o.status)}</small><br>
-      <button class="action grey" onclick="viewBill('${safe(o.id)}')">View Bill</button>
-    </div>`).join(""):"<p>No orders saved yet.</p>";
-  document.getElementById("history").scrollIntoView({behavior:"smooth"});
-}
-function viewBill(id){
-  let o=orders.find(o=>o.id===id);
-  if(!o)return;
-  makeBill(o);
-  document.getElementById("receipt").style.display="block";
-  document.getElementById("receipt").scrollIntoView({behavior:"smooth"});
-}
-function hideHistory(){document.getElementById("history").style.display="none"}
-function goCart(){document.getElementById("cart").scrollIntoView({behavior:"smooth"})}
-function toast(msg){
-  let box=document.getElementById("toast");
-  box.textContent=msg;box.style.display="block";
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>box.style.display="none",2000);
+function makeBill(o) {
+  return `<div class="bill" id="printBill">
+    <h2 style="color:var(--orange)">CraveCart</h2>
+    <p><b>Order Bill</b> · Demo receipt — not a tax invoice</p>
+    <div class="billrow"><span>Order ID</span><b>${escapeHTML(o.id)}</b></div>
+    <div class="billrow"><span>Date</span><span>${escapeHTML(o.date)}</span></div>
+    <div class="billrow"><span>Customer</span><span>${escapeHTML(o.name)}</span></div>
+    <div class="billrow"><span>Phone</span><span>${escapeHTML(o.phone)}</span></div>
+    <div class="billrow"><span>Address</span><span>${escapeHTML(o.address)}</span></div>
+    ${o.items.map(p=>`<div class="billrow"><span>${escapeHTML(p.name)} × ${p.qty}</span><b>₹${p.price*p.qty}</b></div>`).join("")}
+    <div class="billrow"><span>Subtotal</span><b>₹${o.subtotal}</b></div>
+    <div class="billrow"><span>Delivery</span><b>${o.delivery?"₹"+o.delivery:"FREE"}</b></div>
+    <div class="billrow"><span>Payment</span><b>Cash on Delivery</b></div>
+    <div class="billrow"><b>Grand Total</b><b class="billtotal">₹${o.total}</b></div>
+    <p style="text-align:center">Thank you for choosing CraveCart!</p>
+  </div>
+  <div class="actions">
+    <button class="btn" onclick="downloadBill()">⬇ Download / Save PDF</button>
+    <button class="btn outline" onclick="printBill()">🖨 Print Bill</button>
+    <button class="btn outline" onclick="newOrder()">Order More</button>
+  </div>`;
 }
 
-// 9. START WEBSITE
-showCategories();
-showFoods();
+function printBill() {
+  const bill=document.getElementById("printBill");
+  if(!bill) return;
+  const win=window.open("","_blank");
+  if(!win) return alert("Please allow popups to print the bill.");
+  win.document.write(`<!doctype html><html><head><title>CraveCart Bill</title>
+    <style>body{font-family:Arial;padding:25px;color:#111;max-width:650px;margin:auto}
+    .billrow{display:flex;justify-content:space-between;gap:15px;padding:9px 0;border-bottom:1px solid #ddd}
+    .billtotal{font-size:20px}h2{color:#f60}</style></head><body>${bill.innerHTML}</body></html>`);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+function downloadBill() {
+  // Opens the print dialog; select "Save as PDF" to download the bill.
+  printBill();
+}
+function newOrder() {
+  document.getElementById("billArea").innerHTML="";
+  document.getElementById("checkoutForm").style.display="block";
+  loadAddress();
+  renderCart();
+}
+
+renderProducts();
 updateCart();
 </script>
 </body>
