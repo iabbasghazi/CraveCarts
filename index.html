@@ -1,1669 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CraveCart | Food Delivery</title>
+<link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <title>CraveCart — Premium Food Delivery</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,sans-serif;background:#0b0b0b;color:white}
+button,input{font:inherit}
+button{cursor:pointer;border:0}
+header{display:flex;justify-content:space-between;align-items:center;
+padding:18px 7%;border-bottom:1px solid #292929;position:sticky;
+top:0;background:#0b0b0bf2;z-index:5}
+.logo{font-size:25px;font-weight:800;color:#ff7628}
+.logo span{color:white}
+.cart-btn,.primary{background:#ff7628;color:white;padding:11px 17px;
+border-radius:10px;font-weight:600}
 
-    <meta name="description"
-          content="Discover delicious vegetarian food with CraveCart. Order pizza, burgers, Indian food, desserts and more.">
+/* Hero Section from Index 5 */
+.hero{padding:65px 7%;background:radial-gradient(ellipse at top right,#47200e,#0b0b0b 65%);display:flex;align-items:center;justify-content:space-between;gap:30px}
+.hero-content{max-width:600px}
+.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.15;margin:15px 0}
+.hero h1 span{color:#ff7628}
+.hero p{color:#aaa;margin:0 0 25px;line-height:1.7}
+.hero img{width:min(40%,350px);border-radius:50%;filter:drop-shadow(0 0 30px #ff762833)}
+.tag{color:#ff7628;font-weight:700;letter-spacing:2px;font-size:14px}
+.search{width:100%;max-width:500px;padding:14px;border-radius:10px;
+border:1px solid #333;background:#171717;color:white;outline:none;margin-top:10px}
 
-    <meta name="theme-color" content="#0b0b0d">
+section.menu{padding:35px 7%}
+.menu h2{font-size:28px;margin-bottom:20px}
+.categories{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:25px}
+.cat{background:#1b1b1b;color:#ddd;padding:9px 16px;border-radius:20px}
+.cat.active,.cat:hover{background:#ff7628;color:white}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:25px;align-items:start}
+.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:#171717;border:1px solid #292929;border-radius:15px;
+overflow:hidden;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:#ff7628}
+.card img{width:100%;height:155px;object-fit:cover;background:#222}
+.info{padding:13px}
+.info h3{font-size:15px;margin-bottom:5px}
+.info small{color:#999}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:13px}
+.price{color:#ff7628;font-weight:700}
+.add{background:#ff7628;color:white;border-radius:8px;padding:8px 12px}
+.cart{background:#171717;border:1px solid #292929;border-radius:15px;
+padding:18px;position:sticky;top:90px}
+.cart h2{font-size:22px;margin-bottom:15px}
+.cart-items{display:grid;gap:14px}
+.cart-item{border-bottom:1px solid #333;padding-bottom:12px}
+.item-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.item-top button{background:none;color:#ff6b6b}
+.qty{display:flex;align-items:center;gap:12px;margin-top:8px}
+.qty button{background:#292929;color:white;width:27px;height:27px;border-radius:6px}
+.cart-bottom{border-top:1px solid #333;margin-top:16px;padding-top:15px}
+.total{display:flex;justify-content:space-between;font-weight:700;margin:12px 0}
+.cart-action{width:100%;padding:11px;border-radius:9px;margin-top:9px;font-weight:600}
+.checkout{background:#ff7628;color:white}
+.clear{background:#292929;color:white}
+.empty{text-align:center;color:#888;padding:20px 0;font-size:14px}
+footer{text-align:center;color:#777;padding:28px;border-top:1px solid #292929;margin-top:35px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+background:#ff7628;color:white;padding:12px 20px;border-radius:9px;
+display:none;z-index:10;box-shadow:0 5px 25px #0008}
 
-    <link rel="icon"
-          href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
-
-    <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet">
-
-    <!-- Premium Icons -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Main JavaScript -->
-    <script src="app.js" defer></script>
+@media(max-width:1050px){
+.layout{grid-template-columns:1fr}
+.cart{position:static}
+.products{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:768px){
+.hero{flex-direction:column;text-align:center;padding:45px 5%}
+.hero img{width:75%;max-width:260px}
+.hero-content{max-width:100%}
+}
+@media(max-width:650px){
+header{padding:15px 5%}
+section.menu{padding:25px 5%}
+.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card img{height:125px}
+.info{padding:10px}
+.info h3{font-size:13px}
+.cart{padding:14px}
+}
+@media(max-width:360px){
+.products{grid-template-columns:1fr}
+}
+</style>
 </head>
 
 <body>
-
-<!-- =====================================================
-     ANNOUNCEMENT BAR
-===================================================== -->
-
-<div class="announcement-bar">
-    <div class="announcement-content">
-        <i class="fa-solid fa-bolt"></i>
-        <span>Fresh flavours. Fast delivery. Unforgettable cravings.</span>
-        <span class="announcement-highlight">ORDER NOW</span>
-    </div>
-</div>
-
-
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
-<header class="site-header" id="site-header">
-
-    <div class="header-container">
-
-        <!-- BRAND -->
-        <a href="#home" class="brand" aria-label="CraveCart Home">
-
-            <img
-                src="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png"
-                alt="CraveCart Logo"
-                class="brand-logo"
-            >
-
-            <span class="brand-text">
-                <span class="brand-name">Crave<span>Cart</span></span>
-                <span class="brand-tagline">FOOD THAT HITS DIFFERENT</span>
-            </span>
-
-        </a>
-
-
-        <!-- DESKTOP NAVIGATION -->
-        <nav class="main-navigation" id="main-navigation">
-
-            <a href="#home" class="nav-link active">Home</a>
-
-            <a href="#categories" class="nav-link">Categories</a>
-
-            <a href="#products" class="nav-link">Explore Food</a>
-
-            <a href="#why-cravecart" class="nav-link">Why Us</a>
-
-        </nav>
-
-
-        <!-- HEADER ACTIONS -->
-        <div class="header-actions">
-
-            <button
-                class="icon-button search-toggle"
-                id="search-toggle"
-                type="button"
-                aria-label="Search products"
-                title="Search food"
-            >
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-
-
-            <button
-                class="icon-button wishlist-trigger"
-                id="open-wishlist"
-                type="button"
-                data-action="open-wishlist"
-                aria-label="Open favourites"
-                title="My favourites"
-            >
-                <i class="fa-regular fa-heart"></i>
-                <span class="count-badge" id="wishlist-count">0</span>
-            </button>
-
-
-            <button
-                class="icon-button cart-trigger"
-                id="open-cart"
-                type="button"
-                data-action="open-cart"
-                aria-label="Open shopping cart"
-                title="Shopping cart"
-            >
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span class="count-badge" id="cart-count">0</span>
-            </button>
-
-
-            <button
-                class="mobile-menu-toggle"
-                id="mobile-menu-toggle"
-                type="button"
-                aria-label="Toggle navigation"
-                aria-expanded="false"
-            >
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- SEARCH PANEL -->
-    <div class="search-panel" id="search-panel">
-
-        <div class="search-panel-inner">
-
-            <i class="fa-solid fa-magnifying-glass"></i>
-
-            <input
-                type="search"
-                id="product-search"
-                placeholder="Search pizza, burger, pasta..."
-                autocomplete="off"
-                aria-label="Search food products"
-            >
-
-            <button
-                type="button"
-                id="clear-search"
-                class="clear-search-button"
-                aria-label="Clear search"
-            >
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-        </div>
-
-        <p class="search-hint">
-            Find your next favourite bite.
-        </p>
-
-    </div>
-
+<header>
+  <div class="logo">Crave<span>Cart.</span></div>
+  <button class="cart-btn" onclick="goCart()">🛒 Cart (<span id="count">0</span>)</button>
 </header>
 
-
-<!-- =====================================================
-     MAIN CONTENT
-===================================================== -->
-
-<main>
-
-
-<!-- =====================================================
-     HERO SECTION
-===================================================== -->
-
-<section class="hero-section" id="home">
-
-    <div class="hero-background-glow hero-glow-one"></div>
-    <div class="hero-background-glow hero-glow-two"></div>
-
-    <div class="hero-container">
-
-        <div class="hero-content">
-
-            <div class="hero-eyebrow">
-                <span class="hero-eyebrow-dot"></span>
-                <span>YOUR NEXT FOOD OBSESSION</span>
-            </div>
-
-
-            <h1 class="hero-title">
-                Good Food.<br>
-                <span class="hero-title-accent">Great Mood.</span>
-            </h1>
-
-
-            <p class="hero-description">
-                From cheesy pizzas to flavour-packed Indian favourites,
-                discover food that turns every ordinary moment into
-                something delicious.
-            </p>
-
-
-            <div class="hero-buttons">
-
-                <a href="#products" class="button button-primary">
-                    Explore Menu
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
-                <a href="#categories" class="button button-secondary">
-                    <i class="fa-solid fa-utensils"></i>
-                    Browse Categories
-                </a>
-
-            </div>
-
-
-            <div class="hero-trust-row">
-
-                <div class="hero-trust-item">
-                    <span class="trust-icon">
-                        <i class="fa-solid fa-leaf"></i>
-                    </span>
-
-                    <span>
-                        <strong>100% Veg</strong>
-                        <small>Vegetarian menu</small>
-                    </span>
-                </div>
-
-
-                <div class="hero-trust-divider"></div>
-
-
-                <div class="hero-trust-item">
-                    <span class="trust-icon">
-                        <i class="fa-solid fa-heart"></i>
-                    </span>
-
-                    <span>
-                        <strong>Made with Love</strong>
-                        <small>Flavour first</small>
-                    </span>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- HERO VISUAL -->
-        <div class="hero-visual">
-
-            <div class="hero-image-orbit orbit-one"></div>
-            <div class="hero-image-orbit orbit-two"></div>
-
-
-            <div class="hero-image-main">
-
-                <img
-                    src="https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1000&q=85"
-                    alt="Delicious freshly prepared food"
-                    fetchpriority="high"
-                >
-
-            </div>
-
-
-            <div class="floating-food-card floating-card-top">
-
-                <div class="floating-card-icon">
-                    <i class="fa-solid fa-fire"></i>
-                </div>
-
-                <div>
-                    <strong>Freshly Made</strong>
-                    <span>Full of flavour</span>
-                </div>
-
-            </div>
-
-
-            <div class="floating-food-card floating-card-bottom">
-
-                <div class="floating-rating">
-                    <i class="fa-solid fa-star"></i>
-                </div>
-
-                <div>
-                    <strong>Pure Deliciousness</strong>
-                    <span>Your cravings, covered.</span>
-                </div>
-
-            </div>
-
-
-            <div class="hero-decor hero-decor-one">
-                <i class="fa-solid fa-leaf"></i>
-            </div>
-
-            <div class="hero-decor hero-decor-two">
-                <i class="fa-solid fa-pepper-hot"></i>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- HERO BOTTOM STATS -->
-    <div class="hero-stats">
-
-        <div class="hero-stat">
-            <strong>100%</strong>
-            <span>Vegetarian</span>
-        </div>
-
-        <div class="hero-stat">
-            <strong>Fresh</strong>
-            <span>Every Order</span>
-        </div>
-
-        <div class="hero-stat">
-            <strong>Easy</strong>
-            <span>Online Ordering</span>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     CATEGORIES SECTION
-===================================================== -->
-
-<section class="categories-section section-padding" id="categories">
-
-    <div class="section-container">
-
-        <div class="section-heading">
-
-            <div class="section-heading-copy">
-
-                <span class="section-eyebrow">
-                    <i class="fa-solid fa-compass"></i>
-                    EXPLORE THE MENU
-                </span>
-
-                <h2 class="section-title">
-                    What are you <span>craving?</span>
-                </h2>
-
-                <p class="section-description">
-                    Pick your mood. We'll help with the food.
-                </p>
-
-            </div>
-
-            <a href="#products" class="text-link">
-                View all food
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
-        </div>
-
-
-        <!-- JavaScript inserts category buttons here -->
-        <div class="category-list" id="category-list">
-
-            <button
-                type="button"
-                class="category-card active"
-                data-category="all"
-            >
-                <span class="category-card-icon">
-                    <i class="fa-solid fa-utensils"></i>
-                </span>
-
-                <span class="category-card-name">All Food</span>
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     PRODUCTS SECTION
-===================================================== -->
-
-<section class="products-section section-padding" id="products">
-
-    <div class="section-container">
-
-        <div class="section-heading">
-
-            <div class="section-heading-copy">
-
-                <span class="section-eyebrow">
-                    <i class="fa-solid fa-fire"></i>
-                    HANDPICKED FOR YOU
-                </span>
-
-                <h2 class="section-title">
-                    Cravings, <span>served.</span>
-                </h2>
-
-                <p class="section-description">
-                    Discover delicious favourites made for every mood.
-                </p>
-
-            </div>
-
-
-            <div class="product-toolbar">
-
-                <label for="sort-products" class="sort-label">
-                    Sort by
-                </label>
-
-                <select id="sort-products" class="sort-select">
-
-                    <option value="featured">Featured</option>
-
-                    <option value="price-low">
-                        Price: Low to High
-                    </option>
-
-                    <option value="price-high">
-                        Price: High to Low
-                    </option>
-
-                    <option value="rating">
-                        Top Rated
-                    </option>
-
-                    <option value="name">
-                        Name: A to Z
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <!-- ACTIVE FILTERS -->
-        <div class="active-filters" id="active-filters"></div>
-
-
-        <!-- PRODUCT COUNT -->
-        <div class="products-meta">
-
-            <p class="products-result-text">
-                Showing
-                <strong id="product-results-count">0</strong>
-                delicious products
-            </p>
-
-            <button
-                type="button"
-                class="reset-filters-button"
-                id="reset-filters"
-            >
-                <i class="fa-solid fa-rotate-left"></i>
-                Reset filters
-            </button>
-
-        </div>
-
-
-        <!-- PRODUCT GRID -->
-        <div class="products-grid" id="products-grid">
-
-            <div class="products-loading">
-
-                <span class="loading-spinner"></span>
-
-                <p>Preparing something delicious...</p>
-
-            </div>
-
-        </div>
-
-
-        <!-- NO RESULTS -->
-        <div class="no-results" id="no-results" hidden>
-
-            <div class="no-results-icon">
-                <i class="fa-solid fa-face-sad-tear"></i>
-            </div>
-
-            <h3>No food found</h3>
-
-            <p>
-                Try another search or choose a different category.
-            </p>
-
-            <button
-                type="button"
-                class="button button-primary"
-                id="show-all-products"
-            >
-                Show all products
-            </button>
-
-        </div>
-
-
-        <!-- LOAD MORE -->
-        <div class="products-bottom-action">
-
-            <button
-                type="button"
-                class="button button-secondary"
-                id="load-more-products"
-            >
-                Explore More
-                <i class="fa-solid fa-arrow-down"></i>
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     PROMOTIONAL BANNER
-===================================================== -->
-
-<section class="promo-section">
-
-    <div class="section-container">
-
-        <div class="promo-banner">
-
-            <div class="promo-glow"></div>
-
-            <div class="promo-content">
-
-                <span class="promo-label">
-                    <i class="fa-solid fa-sparkles"></i>
-                    A LITTLE SOMETHING EXTRA
-                </span>
-
-                <h2>
-                    More flavour.<br>
-                    <span>Less spending.</span>
-                </h2>
-
-                <p>
-                    Use our welcome coupon at checkout and save on
-                    your delicious order.
-                </p>
-
-                <div class="promo-coupon">
-
-                    <span>YOUR COUPON</span>
-
-                    <strong id="promo-coupon-code">CRAVE10</strong>
-
-                    <button
-                        type="button"
-                        id="copy-coupon"
-                        class="copy-coupon-button"
-                    >
-                        <i class="fa-regular fa-copy"></i>
-                        Copy
-                    </button>
-
-                </div>
-
-                <a href="#products" class="button button-light">
-                    Order Your Favourites
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-
-            <div class="promo-visual">
-
-                <div class="promo-circle"></div>
-
-                <img
-                    src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=85"
-                    alt="Freshly baked pizza"
-                    loading="lazy"
-                >
-
-                <span class="promo-sticker">
-                    <i class="fa-solid fa-heart"></i>
-                    Made to crave
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     WHY CRAVECART
-===================================================== -->
-
-<section
-    class="benefits-section section-padding"
-    id="why-cravecart"
->
-
-    <div class="section-container">
-
-        <div class="section-heading section-heading-centered">
-
-            <span class="section-eyebrow">
-                THE CRAVECART DIFFERENCE
-            </span>
-
-            <h2 class="section-title">
-                Food that feels <span>special.</span>
-            </h2>
-
-            <p class="section-description">
-                Good food deserves a better experience.
-            </p>
-
-        </div>
-
-
-        <div class="benefits-grid">
-
-            <article class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-leaf"></i>
-                </div>
-
-                <h3>Vegetarian Goodness</h3>
-
-                <p>
-                    Explore a menu dedicated to delicious vegetarian
-                    favourites and satisfying flavours.
-                </p>
-
-            </article>
-
-
-            <article class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                </div>
-
-                <h3>Easy Ordering</h3>
-
-                <p>
-                    Browse products, save favourites and manage
-                    everything in one convenient cart.
-                </p>
-
-            </article>
-
-
-            <article class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-
-                <h3>Clear Billing</h3>
-
-                <p>
-                    See your subtotal, delivery charge, discount
-                    and estimated tax before placing an order.
-                </p>
-
-            </article>
-
-
-            <article class="benefit-card">
-
-                <div class="benefit-icon">
-                    <i class="fa-solid fa-heart"></i>
-                </div>
-
-                <h3>Made for Your Taste</h3>
-
-                <p>
-                    Save your favourite food and find it quickly
-                    whenever the cravings return.
-                </p>
-
-            </article>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     NEWSLETTER
-===================================================== -->
-
-<section class="newsletter-section">
-
-    <div class="section-container">
-
-        <div class="newsletter-card">
-
-            <div class="newsletter-content">
-
-                <span class="section-eyebrow">
-                    A LITTLE TASTE OF SOMETHING GOOD
-                </span>
-
-                <h2>
-                    Stay in the <span>flavour loop.</span>
-                </h2>
-
-                <p>
-                    Join our newsletter for menu updates and special offers.
-                </p>
-
-            </div>
-
-
-            <form class="newsletter-form" id="newsletter-form">
-
-                <div class="newsletter-input-wrap">
-
-                    <i class="fa-regular fa-envelope"></i>
-
-                    <input
-                        type="email"
-                        id="newsletter-email"
-                        name="email"
-                        placeholder="Enter your email address"
-                        aria-label="Email address"
-                        required
-                    >
-
-                </div>
-
-                <button
-                    type="submit"
-                    class="button button-primary"
-                >
-                    Subscribe
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-
-            </form>
-
-            <p class="newsletter-message" id="newsletter-message"></p>
-
-        </div>
-
-    </div>
-
-</section>
-
-</main>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer class="site-footer">
-
-    <div class="section-container">
-
-        <div class="footer-main">
-
-
-            <div class="footer-brand-column">
-
-                <a href="#home" class="brand footer-brand">
-
-                    <img
-                        src="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png"
-                        alt="CraveCart Logo"
-                        class="brand-logo"
-                        loading="lazy"
-                    >
-
-                    <span class="brand-text">
-                        <span class="brand-name">
-                            Crave<span>Cart</span>
-                        </span>
-
-                        <span class="brand-tagline">
-                            FOOD THAT HITS DIFFERENT
-                        </span>
-                    </span>
-
-                </a>
-
-                <p class="footer-description">
-                    Your cravings deserve the best.
-                    Discover your next delicious moment with CraveCart.
-                </p>
-
-
-                <div class="footer-socials">
-
-                    <a href="#home" aria-label="Instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                    </a>
-
-                    <a href="#home" aria-label="Facebook">
-                        <i class="fa-brands fa-facebook-f"></i>
-                    </a>
-
-                    <a href="#home" aria-label="X">
-                        <i class="fa-brands fa-x-twitter"></i>
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <div class="footer-links-column">
-
-                <h3>Explore</h3>
-
-                <a href="#home">Home</a>
-
-                <a href="#categories">Categories</a>
-
-                <a href="#products">Our Menu</a>
-
-                <a href="#why-cravecart">Why CraveCart</a>
-
-            </div>
-
-
-            <div class="footer-links-column">
-
-                <h3>Your Account</h3>
-
-                <button
-                    type="button"
-                    class="footer-action"
-                    data-action="open-cart"
-                >
-                    Shopping Cart
-                </button>
-
-                <button
-                    type="button"
-                    class="footer-action"
-                    data-action="open-wishlist"
-                >
-                    My Favourites
-                </button>
-
-                <button
-                    type="button"
-                    class="footer-action"
-                    id="footer-view-orders"
-                >
-                    My Orders
-                </button>
-
-            </div>
-
-
-            <div class="footer-links-column">
-
-                <h3>Need Help?</h3>
-
-                <a href="mailto:hello@cravecart.example">
-                    Contact Us
-                </a>
-
-                <a href="#why-cravecart">About Us</a>
-
-                <a href="#home">Privacy Policy</a>
-
-                <a href="#home">Terms & Conditions</a>
-
-            </div>
-
-        </div>
-
-
-        <div class="footer-bottom">
-
-            <p>
-                &copy; <span id="current-year"></span>
-                CraveCart. All rights reserved.
-            </p>
-
-            <p class="footer-made-with">
-                Made with <i class="fa-solid fa-heart"></i> for food lovers
-            </p>
-
-        </div>
-
-    </div>
-
-</footer>
-
-
-<!-- =====================================================
-     CART OVERLAY
-===================================================== -->
-
-<div
-    class="drawer-overlay"
-    id="cart-overlay"
-    data-action="close-cart"
-    aria-hidden="true"
-></div>
-
-
-<!-- =====================================================
-     SHOPPING CART DRAWER
-===================================================== -->
-
-<aside
-    class="cart-drawer"
-    id="cart-drawer"
-    aria-label="Shopping cart"
-    aria-hidden="true"
->
-
-    <div class="drawer-header">
-
-        <div>
-
-            <span class="drawer-eyebrow">YOUR SELECTION</span>
-
-            <h2>
-                Your Cart
-                <span class="heading-count" id="cart-heading-count">0</span>
-            </h2>
-
-        </div>
-
-        <button
-            type="button"
-            class="close-button"
-            data-action="close-cart"
-            aria-label="Close cart"
-        >
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-
-    </div>
-
-
-    <div class="delivery-progress">
-
-        <p id="delivery-progress-text">
-            Add food to start your order.
-        </p>
-
-        <div class="progress-track">
-            <div
-                class="progress-bar"
-                id="cart-progress-bar"
-            ></div>
-        </div>
-
-    </div>
-
-
-    <!-- CART PRODUCTS -->
-    <div class="cart-items" id="cart-items">
-
-        <div class="empty-state cart-empty-state">
-
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-basket-shopping"></i>
-            </div>
-
-            <h3>Your cart is feeling lonely</h3>
-
-            <p>Add something delicious to get started.</p>
-
-            <button
-                type="button"
-                class="button button-primary"
-                data-action="close-cart"
-            >
-                Explore Food
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- CART FOOTER -->
-    <div class="cart-footer">
-
-        <div class="coupon-section">
-
-            <label for="coupon-code">
-                Have a coupon?
-            </label>
-
-            <div class="coupon-input-row">
-
-                <input
-                    type="text"
-                    id="coupon-code"
-                    placeholder="Enter coupon code"
-                    autocomplete="off"
-                >
-
-                <button
-                    type="button"
-                    id="apply-coupon"
-                    class="button button-secondary"
-                >
-                    Apply
-                </button>
-
-            </div>
-
-            <p id="coupon-message" class="coupon-message"></p>
-
-        </div>
-
-
-        <!-- BILL SUMMARY -->
-        <div class="bill-summary">
-
-            <div class="bill-row">
-
-                <span>Subtotal</span>
-
-                <strong id="cart-subtotal">₹0.00</strong>
-
-            </div>
-
-
-            <div class="bill-row">
-
-                <span>Delivery</span>
-
-                <strong id="cart-delivery">₹0.00</strong>
-
-            </div>
-
-
-            <div class="bill-row">
-
-                <span>Estimated tax</span>
-
-                <strong id="cart-tax">₹0.00</strong>
-
-            </div>
-
-
-            <div
-                class="bill-row discount-row"
-                id="discount-row"
-                hidden
-            >
-
-                <span>Discount</span>
-
-                <strong id="cart-discount">-₹0.00</strong>
-
-            </div>
-
-
-            <div class="bill-row bill-total-row">
-
-                <span>Total</span>
-
-                <strong id="cart-total">₹0.00</strong>
-
-            </div>
-
-        </div>
-
-
-        <button
-            type="button"
-            class="button button-primary checkout-button"
-            data-action="checkout"
-        >
-            Proceed to Checkout
-            <i class="fa-solid fa-arrow-right"></i>
-        </button>
-
-
-        <p class="secure-checkout-note">
-            <i class="fa-solid fa-shield-halved"></i>
-            Review your order before confirming.
-        </p>
-
-    </div>
-
-</aside>
-
-
-<!-- =====================================================
-     WISHLIST OVERLAY
-===================================================== -->
-
-<div
-    class="modal-overlay"
-    id="wishlist-overlay"
-    data-action="close-wishlist"
-    aria-hidden="true"
-></div>
-
-
-<!-- =====================================================
-     WISHLIST MODAL
-===================================================== -->
-
-<section
-    class="side-modal wishlist-modal"
-    id="wishlist-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-label="My favourites"
-    aria-hidden="true"
->
-
-    <div class="modal-header">
-
-        <div>
-
-            <span class="drawer-eyebrow">SAVED WITH LOVE</span>
-
-            <h2>
-                My Favourites
-                <i class="fa-solid fa-heart wishlist-heading-heart"></i>
-            </h2>
-
-        </div>
-
-        <button
-            type="button"
-            class="close-button"
-            data-action="close-wishlist"
-            aria-label="Close favourites"
-        >
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-
-    </div>
-
-
-    <div class="wishlist-items" id="wishlist-items">
-
-        <div class="empty-state wishlist-empty-state">
-
-            <div class="empty-state-icon">
-                <i class="fa-regular fa-heart"></i>
-            </div>
-
-            <h3>No favourites yet</h3>
-
-            <p>Tap the heart on any food item to save it here.</p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     CHECKOUT OVERLAY
-===================================================== -->
-
-<div
-    class="modal-overlay"
-    id="checkout-overlay"
-    data-action="close-checkout"
-    aria-hidden="true"
-></div>
-
-
-<!-- =====================================================
-     CHECKOUT MODAL
-===================================================== -->
-
-<section
-    class="checkout-modal"
-    id="checkout-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="checkout-title"
-    aria-hidden="true"
->
-
-    <div class="modal-header">
-
-        <div>
-
-            <span class="drawer-eyebrow">ALMOST THERE</span>
-
-            <h2 id="checkout-title">Checkout</h2>
-
-        </div>
-
-        <button
-            type="button"
-            class="close-button"
-            data-action="close-checkout"
-            aria-label="Close checkout"
-        >
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-
-    </div>
-
-
-    <div class="checkout-body">
-
-        <div class="checkout-intro">
-
-            <div class="checkout-intro-icon">
-                <i class="fa-solid fa-location-dot"></i>
-            </div>
-
-            <div>
-
-                <h3>Where should we deliver?</h3>
-
-                <p>Enter your details to prepare your order.</p>
-
-            </div>
-
-        </div>
-
-
-        <form id="checkout-form" class="checkout-form">
-
-            <div class="form-group">
-
-                <label for="customer-name">Full Name *</label>
-
-                <input
-                    type="text"
-                    id="customer-name"
-                    name="customerName"
-                    placeholder="Enter your full name"
-                    minlength="2"
-                    maxlength="100"
-                    autocomplete="name"
-                    required
-                >
-
-            </div>
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="customer-phone">Phone Number *</label>
-
-                    <input
-                        type="tel"
-                        id="customer-phone"
-                        name="customerPhone"
-                        placeholder="10-digit mobile number"
-                        inputmode="numeric"
-                        pattern="[6-9][0-9]{9}"
-                        maxlength="10"
-                        autocomplete="tel"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="customer-email">Email Address</label>
-
-                    <input
-                        type="email"
-                        id="customer-email"
-                        name="customerEmail"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="customer-address">Delivery Address *</label>
-
-                <textarea
-                    id="customer-address"
-                    name="customerAddress"
-                    placeholder="House number, street, area..."
-                    rows="3"
-                    minlength="5"
-                    maxlength="500"
-                    autocomplete="street-address"
-                    required
-                ></textarea>
-
-            </div>
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label for="customer-city">City *</label>
-
-                    <input
-                        type="text"
-                        id="customer-city"
-                        name="customerCity"
-                        placeholder="Your city"
-                        autocomplete="address-level2"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="customer-pincode">PIN Code *</label>
-
-                    <input
-                        type="text"
-                        id="customer-pincode"
-                        name="customerPincode"
-                        placeholder="6-digit PIN"
-                        inputmode="numeric"
-                        pattern="[0-9]{6}"
-                        maxlength="6"
-                        autocomplete="postal-code"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="checkout-payment-info">
-
-                <i class="fa-solid fa-circle-info"></i>
-
-                <p>
-                    Demo checkout: no real payment will be collected.
-                    Your order will be recorded in this browser.
-                </p>
-
-            </div>
-
-
-            <div class="checkout-total-row">
-
-                <span>Order Total</span>
-
-                <strong id="checkout-total">₹0.00</strong>
-
-            </div>
-
-
-            <button
-                type="submit"
-                class="button button-primary place-order-button"
-                id="place-order-button"
-            >
-                Confirm Demo Order
-                <i class="fa-solid fa-check"></i>
-            </button>
-
-
-            <p class="checkout-terms">
-                Please verify your address and order details before confirming.
-            </p>
-
-        </form>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     INVOICE MODAL
-===================================================== -->
-
-<div
-    class="modal-overlay"
-    id="invoice-overlay"
-    data-action="close-invoice"
-    aria-hidden="true"
-></div>
-
-
-<section
-    class="invoice-modal"
-    id="invoice-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="invoice-modal-title"
-    aria-hidden="true"
->
-
-    <div class="modal-header invoice-modal-header">
-
-        <div>
-
-            <span class="drawer-eyebrow">ORDER CONFIRMED</span>
-
-            <h2 id="invoice-modal-title">Your Receipt</h2>
-
-        </div>
-
-        <button
-            type="button"
-            class="close-button"
-            data-action="close-invoice"
-            aria-label="Close invoice"
-        >
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-
-    </div>
-
-
-    <div id="invoice-content" class="invoice-content">
-
-        <div class="invoice-placeholder">
-
-            <i class="fa-solid fa-receipt"></i>
-
-            <p>Your order receipt will appear here.</p>
-
-        </div>
-
-    </div>
-
-
-    <div class="invoice-actions">
-
-        <button
-            type="button"
-            class="button button-secondary"
-            id="download-invoice"
-        >
-            <i class="fa-solid fa-download"></i>
-            Download Receipt
-        </button>
-
-        <button
-            type="button"
-            class="button button-primary"
-            id="print-invoice"
-        >
-            <i class="fa-solid fa-print"></i>
-            Print Receipt
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     ORDER HISTORY MODAL
-===================================================== -->
-
-<div
-    class="modal-overlay"
-    id="orders-overlay"
-    data-action="close-orders"
-    aria-hidden="true"
-></div>
-
-
-<section
-    class="side-modal orders-modal"
-    id="orders-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-label="My orders"
-    aria-hidden="true"
->
-
-    <div class="modal-header">
-
-        <div>
-
-            <span class="drawer-eyebrow">YOUR FOOD JOURNEY</span>
-
-            <h2>My Orders</h2>
-
-        </div>
-
-        <button
-            type="button"
-            class="close-button"
-            data-action="close-orders"
-            aria-label="Close order history"
-        >
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-
-    </div>
-
-
-    <div class="orders-list" id="orders-list">
-
-        <div class="empty-state">
-
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-receipt"></i>
-            </div>
-
-            <h3>No orders yet</h3>
-
-            <p>Your demo orders will appear here after checkout.</p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     TOAST NOTIFICATIONS
-===================================================== -->
-
-<div
-    class="toast-container"
-    id="toast-container"
-    aria-live="polite"
-    aria-atomic="false"
-></div>
-
-
-<!-- =====================================================
-     BACK TO TOP
-===================================================== -->
-
-<button
-    type="button"
-    class="back-to-top"
-    id="back-to-top"
-    aria-label="Back to top"
-    title="Back to top"
->
-    <i class="fa-solid fa-arrow-up"></i>
-</button>
-
-
-<!-- =====================================================
-     MOBILE BOTTOM NAVIGATION
-===================================================== -->
-
-<nav class="mobile-bottom-nav" aria-label="Quick navigation">
-
-    <a href="#home" class="mobile-nav-item">
-        <i class="fa-solid fa-house"></i>
-        <span>Home</span>
-    </a>
-
-    <a href="#categories" class="mobile-nav-item">
-        <i class="fa-solid fa-layer-group"></i>
-        <span>Categories</span>
-    </a>
-
-    <button
-        type="button"
-        class="mobile-nav-item"
-        data-action="open-wishlist"
-    >
-        <i class="fa-regular fa-heart"></i>
-        <span>Saved</span>
-    </button>
-
-    <button
-        type="button"
-        class="mobile-nav-item"
-        data-action="open-cart"
-    >
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span>Cart</span>
-    </button>
-
-</nav>
-
-
-<!-- =====================================================
-     DEMO MODE INDICATOR
-===================================================== -->
-
-<div class="demo-mode-indicator" id="demo-mode-indicator">
-
-    <span class="demo-status-dot"></span>
-
-    <span>DEMO MODE</span>
-
+<div class="hero">
+  <div class="hero-content">
+     <div class="tag">GOOD FOOD. GOOD MOOD.</div>
+    <h1>Cravings meet<br><span>their match.</span></h1>
+
+    <p>Delicious food, incredible flavours and your favourites all in one place. Pick your meal and enjoy!</p>
+    <input class="search" id="search" placeholder="🔍 Search your favourite food..." oninput="renderFoods()">
+  </div>
+  <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80" alt="Delicious burger">
 </div>
 
+<section class="menu">
+  <h2>Explore Our Menu 🍽️</h2>
+  <div class="categories" id="categories"></div>
+  <div class="layout">
+    <div class="products" id="products"></div>
 
-<!-- =====================================================
-     ACCESSIBILITY ANNOUNCEMENT
-===================================================== -->
+    <aside class="cart" id="cart">
+      <h2>🛒 Your Cart</h2>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-bottom">
+        <div class="total"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+        <div class="total"><span>Delivery</span><span id="delivery">₹0</span></div>
+        <div class="total"><span>Total</span><span id="total">₹0</span></div>
+        <button class="cart-action checkout" onclick="checkout()">Place Order</button>
+        <button class="cart-action clear" onclick="clearCart()">Clear Cart</button>
+      </div>
+    </aside>
+  </div>
+</section>
 
-<div
-    id="accessibility-announcer"
-    class="visually-hidden"
-    aria-live="polite"
-    aria-atomic="true"
-></div>
+<footer>© 2026 CraveCart | Made with ❤️ for food lovers</footer>
+<div id="toast"></div>
 
+<script>
+// 1. FOOD MENU: 30 PRODUCTS (From Index 6)
+const foods = [
+  {id:2,name:"Paneer Butter Masala",price:199,cat:"Indian",img:"photo-1631452180519-c014fe946bc7"},
+  {id:3,name:"Masala Dosa",price:99,cat:"Indian",img:"photo-1589301760014-d929f3979dbc"},
+  {id:4,name:"Chole Bhature",price:129,cat:"Indian",img:"photo-1626132647523-66f5bf380027"},
+  {id:5,name:"Veg Thali",price:179,cat:"Indian",img:"photo-1546833999-b9f581a1996d"},
+  {id:6,name:"Samosa",price:30,cat:"Snacks",img:"photo-1601050690597-df0568f70950"},
+  {id:7,name:"Spring Rolls",price:119,cat:"Snacks",img:"photo-1544025162-d76694265947"},
+  {id:8,name:"French Fries",price:89,cat:"Snacks",img:"photo-1573080496219-bb080dd4f877"},
+  {id:9,name:"Veg Sandwich",price:99,cat:"Snacks",img:"photo-1528735602780-2552fd46c7af"},
+  {id:10,name:"Margherita Pizza",price:179,cat:"Pizza",img:"photo-1579751626657-72bc17010498"},
+  {id:11,name:"Farmhouse Pizza",price:249,cat:"Pizza",img:"photo-1513104890138-7c749659a591"},
+  {id:12,name:"Cheese Burst Pizza",price:279,cat:"Pizza",img:"photo-1571407970349-bc81e7e96d47"},
+  {id:13,name:"Classic Burger",price:129,cat:"Burger",img:"photo-1568901346375-23c9450c58cd"},
+  {id:15,name:"Chicken Burger",price:179,cat:"Burger",img:"photo-1571091718767-18b5b1457add"},
+  {id:16,name:"White Sauce Pasta",price:169,cat:"Pasta",img:"photo-1473093295043-cdd812d0e601"},
+  {id:17,name:"Red Sauce Pasta",price:159,cat:"Pasta",img:"photo-1551183053-bf91a1d81141"},
+  {id:18,name:"Chocolate Brownie",price:99,cat:"Dessert",img:"photo-1606313564200-e75d5e30476c"},
+  {id:19,name:"Chocolate Cake",price:129,cat:"Dessert",img:"photo-1578985545062-69928b1d9587"},
+  {id:20,name:"Vanilla Ice Cream",price:79,cat:"Dessert",img:"photo-1563805042-7684c019e1cb"},
+  {id:21,name:"Chocolate Milkshake",price:119,cat:"Drinks",img:"photo-1572490122747-3968b75cc699"},
+  {id:22,name:"Cold Coffee",price:99,cat:"Drinks",img:"photo-1461023058943-07fcbe16d735"},
+  {id:24,name:"Mango Smoothie",price:129,cat:"Drinks",img:"photo-1505252585461-04db1eb84625"},
+  {id:25,name:"Chicken Momos",price:139,cat:"Snacks",img:"photo-1563245372-f21724e3856d"},
+  {id:26,name:"Hakka Noodles",price:149,cat:"Chinese",img:"photo-1585032226651-759b368d7246"},
+  {id:27,name:"Veg Fried Rice",price:139,cat:"Chinese",img:"photo-1603133872878-684f208fb84b"},
+  {id:28,name:"Manchurian",price:149,cat:"Chinese",img:"photo-1512058564366-18510be2db19"},
+  {id:29,name:"Grilled Cheese Sandwich",price:119,cat:"Snacks",img:"photo-1528735602780-2552fd46c7af"},
+  {id:30,name:"Strawberry Shake",price:119,cat:"Drinks",img:"photo-1553530666-ba11a7da3888"}
+].map(f=>({...f,img:`https://images.unsplash.com/${f.img}?auto=format&fit=crop&w=600&q=80`}));
 
-<!-- =====================================================
-     END OF CRAVECART
-===================================================== -->
+// 2. APP STATE
+let category = "All";
+let cart = JSON.parse(localStorage.getItem("cravecart") || "{}");
 
-    <!-- CraveCart Main Stylesheet -->
-<link rel="stylesheet" href="style.css">
+// 3. CREATE CATEGORY BUTTONS
+function renderCategories(){
+  const cats = ["All",...new Set(foods.map(f=>f.cat))];
+  document.getElementById("categories").innerHTML = cats.map(c=>
+    `<button class="cat ${category===c?"active":""}" onclick="setCategory('${c}')">${c}</button>`
+  ).join("");
+}
 
-<!-- CraveCart Main JavaScript -->
-<script src="app.js" defer></script>
+function setCategory(c){
+  category=c;
+  renderCategories();
+  renderFoods();
+}
 
-    
-</body>
-</html>
+// 4. DISPLAY FOOD CARDS
+function renderFoods(){
+  const query=document.getElementById("search").value.toLowerCase();
+  const list=foods.filter(f=>
+    (category==="All"||f.cat===category) &&
+    f.name.toLowerCase().includes(query)
+  );
+  document.getElementById("products").innerHTML=list.length?list.map(f=>`
+    <article class="card">
+      <img src="${f.img}" alt="${f.name}" loading="lazy">
+      <div class="info">
+        <h3>${f.name}</h3>
+        <small>${f.cat}</small>
+        <div class="price-row">
+          <span class="price">₹${f.price}</span>
+          <button class="add" onclick="addToCart(${f.id})">+ Add</button>
+        </div>
+      </div>
+    </article>`).join(""):`<p>No food found.</p>`;
+}
 
+// 5. CART FUNCTIONS
+function saveCart(){
+  localStorage.setItem("cravecart",JSON.stringify(cart));
+  renderCart();
+}
+
+function addToCart(id){
+  cart[id]=(cart[id]||0)+1;
+  saveCart();
+  toast("Added to cart!");
+}
+
+function changeQty(id,amount){
+  cart[id]=(cart[id]||0)+amount;
+  if(cart[id]<=0) delete cart[id];
+  saveCart();
+}
+
+function clearCart(){
+  cart={};
+  saveCart();
+  toast("Cart cleared!");
+}
+
+function renderCart(){
+  let subtotal=0,count=0;
+  const items=foods.filter(f=>cart[f.id]>0);
+
+  document.getElementById("cartItems").innerHTML=items.length?
+  items.map(f=>{
+    const qty=cart[f.id];
+    subtotal+=f.price*qty;
+    count+=qty;
+    return `<div class="cart-item">
+      <div class="item-top">
+        <span>${f.name}</span>
+        <button onclick="changeQty(${f.id},-${qty})">Remove</button>
+      </div>
+      <div class="item-top">
+        <span>₹${f.price*qty}</span>
+        <div class="qty">
+          <button onclick="changeQty(${f.id},-1)">−</button>
+          <span>${qty}</span>
+          <button onclick="changeQty(${f.id},1)">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join(""):`<div class="empty">Your cart is empty 🛒<br>Add something tasty!</div>`;
+
+  const delivery=subtotal===0||subtotal>=499?0:40;
+  document.getElementById("count").textContent=count;
+  document.getElementById("subtotal").textContent="₹"+subtotal;
+  document.getElementById("delivery").textContent=delivery===0?"FREE":"₹"+delivery;
+  document.getElementById("total").textContent="₹"+(subtotal+delivery);
+}
+
+// 6. CHECKOUT DEMO
+function checkout(){
+  const items=foods.filter(f=>cart[f.id]>0);
+  if(!items.length){toast("Please add food first!");return;}
+  const subtotal=items.reduce((sum,f)=>sum+f.price*cart[f.id],0);
+  const delivery=subtotal>=499?0:40;
+  alert("CraveCart Order Summary\n\nItems: "+
+    items.reduce((n,f)=>n+cart[f.id],0)+
+    "\nSubtotal: ₹"+subtotal+
+    "\nDelivery: ₹"+delivery+
+    "\nTotal: ₹"+(subtotal+delivery)+
+    "\n\nDemo only — no real order was placed.");
+}
+
+function goCart(){
+  document.getElementById("cart").scrollIntoView({behavior:"smooth"});
+}
+
+function toast(message){
+  const box=document.getElementById("toast");
+  box.textContent=message;
+  box.style.display="block";
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>box.style.display="none",1800);
+}
+
+// 7. START APP
+renderCategories();
+renderFoods();
+renderCart();
+</script>
 </body>
 </html>
