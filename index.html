@@ -1,515 +1,664 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CraveCart — Taste the Good Life</title>
-<link rel="icon" href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-:root{--bg:#080808;--panel:#111;--card:#151515;--orange:#ff7518;--text:#f8f8f8;--muted:#969696;--line:#292929}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:100px}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-svg{width:19px;height:19px;vertical-align:middle}
-a{color:inherit;text-decoration:none}
-.topbar{padding:9px 5%;text-align:center;background:#1a100a;color:#ffb782;font-size:12px}
-header{position:sticky;top:0;z-index:8;background:#090909ed;backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-.nav{max-width:1400px;margin:auto;padding:15px 5%;display:flex;align-items:center;gap:26px}
-.logo{font-size:26px;font-weight:800;letter-spacing:-1.4px;color:var(--orange);white-space:nowrap}
-.logo span{color:white}
-.search{display:flex;align-items:center;gap:10px;flex:1;background:#151515;border:1px solid #303030;padding:0 14px;border-radius:12px}
-.search:focus-within{border-color:var(--orange)}
-.search input{width:100%;min-width:0;background:transparent;color:white;border:0;outline:0;padding:13px 0}
-.search svg{color:var(--muted)}
-.iconbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #303030;background:#151515;color:white;border-radius:11px;padding:11px 13px}
-.iconbtn:hover{border-color:var(--orange)}
-.cartbtn{background:var(--orange);color:#15100b;border:0;font-weight:700}
-.count{background:#111;color:white;border-radius:20px;padding:2px 7px;font-size:11px}
-.container{width:min(1400px,92%);margin:auto}
-.hero{position:relative;overflow:hidden;margin:28px auto 34px;min-height:370px;border:1px solid #42210e;border-radius:25px;background:radial-gradient(ellipse at 75% 55%,#ff75183c,transparent 44%),linear-gradient(110deg,#17100b,#0c0b0a 65%,#1b1009);display:grid;grid-template-columns:1.1fr .9fr;align-items:center;padding:48px 6%}
-.hero:before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;border:1px solid #ff75182b;right:12%;top:10%}
-.hero-copy{position:relative;z-index:1}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;color:#ffb17b;background:#ff751815;border:1px solid #ff75183d;border-radius:30px;padding:8px 13px;font-size:12px;font-weight:600}
-.hero h1{font-size:clamp(35px,5vw,64px);line-height:1.12;letter-spacing:-2px;margin:20px 0 14px}
-.hero h1 span{color:var(--orange)}
-.hero p{color:#aaa;max-width:440px;line-height:1.8;font-size:14px}
-.primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--orange);border:0;color:#15100b;border-radius:11px;padding:13px 19px;font-weight:800;transition:.2s}
-.primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px #ff751832}
-.hero .primary{margin-top:13px}
-.hero-art{position:relative;display:grid;place-items:center;min-height:260px}
-.hero-art img{width:min(100%,400px);height:280px;object-fit:cover;border-radius:50%;filter:drop-shadow(0 20px 30px #000);mask-image:radial-gradient(ellipse,#000 52%,transparent 72%)}
-.float-tag{position:absolute;background:#181512;border:1px solid #3b2b20;border-radius:13px;padding:11px 14px;box-shadow:0 8px 30px #0008;font-size:12px}
-.float-tag b{display:block;color:var(--orange);font-size:14px}
-.tag-one{top:25px;right:0}.tag-two{bottom:25px;left:0}
-.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:42px}
-.benefit{display:flex;gap:13px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(130deg,#151515,#0d0d0d)}
-.benefit .ico{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border-radius:12px;color:var(--orange);background:#ff751817}
-.benefit b{display:block;font-size:13px}.benefit small{color:var(--muted);font-size:11px}
-.section{margin:38px 0}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:18px}
-.section-head h2{font-size:clamp(22px,3vw,30px);letter-spacing:-.8px;margin:0}
-.section-head p{margin:5px 0 0;color:var(--muted);font-size:12px}
-.linkbtn{background:transparent;border:0;color:var(--orange);font-weight:700}
-.categories{display:flex;gap:10px;overflow-x:auto;padding:2px 1px 13px;scrollbar-width:thin}
-.chip{display:flex;align-items:center;gap:8px;white-space:nowrap;background:#121212;color:#ddd;border:1px solid #2c2c2c;padding:10px 15px;border-radius:12px}
-.chip svg{color:var(--orange);width:17px}
-.chip.active,.chip:hover{background:#ff75181a;border-color:var(--orange);color:#fff}
-.filters{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr auto;gap:10px;margin:18px 0}
-.control{min-width:0;background:#121212;color:white;border:1px solid #303030;border-radius:10px;padding:12px}
-.pricebox{display:flex;align-items:center;gap:10px;background:#121212;border:1px solid #303030;border-radius:10px;padding:0 10px;font-size:12px;color:var(--muted)}
-.pricebox input{width:100%;accent-color:var(--orange)}
-.product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
-.product{position:relative;overflow:hidden;background:var(--card);border:1px solid #242424;border-radius:17px;transition:transform .22s,border-color .22s}
-.product:hover{transform:translateY(-5px);border-color:#75401f}
-.product-img{position:relative;background:#1a1a1a;overflow:hidden}
-.product-img img{width:100%;height:190px;object-fit:cover;display:block;transition:transform .35s}
-.product:hover .product-img img{transform:scale(1.05)}
-.vegmark{position:absolute;left:11px;top:11px;background:#0b160e;border:1px solid #4b9859;border-radius:6px;width:20px;height:20px;display:grid;place-items:center}
-.vegmark:after{content:"";width:8px;height:8px;background:#55d66c;border-radius:50%}
-.fav{position:absolute;right:10px;top:10px;width:35px;height:35px;border:0;border-radius:50%;background:#101010d9;color:#fff;display:grid;place-items:center}
-.fav.active{color:#ff5267}
-.badge{position:absolute;left:10px;bottom:10px;background:var(--orange);color:#111;font-weight:800;font-size:10px;padding:5px 8px;border-radius:6px}
-.product-body{padding:14px}
-.product-top{display:flex;align-items:start;justify-content:space-between;gap:8px}
-.product h3{font-size:14px;line-height:1.5;margin:0}
-.rating{font-size:11px;color:#ffd166;white-space:nowrap}
-.product-desc{color:var(--muted);font-size:11px;line-height:1.6;margin:7px 0;min-height:35px}
-.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:13px}
-.price{font-size:19px;font-weight:800}
-.add{display:flex;align-items:center;gap:5px;background:#ff751816;color:var(--orange);border:1px solid #ff75184d;border-radius:9px;padding:8px 11px;font-weight:800}
-.add:hover{background:var(--orange);color:#111}
-.add svg{width:16px}
-.results{color:var(--muted);font-size:12px}
-.empty{grid-column:1/-1;text-align:center;padding:55px 15px;color:var(--muted);border:1px dashed #333;border-radius:15px}
-.empty svg{width:35px;height:35px;color:var(--orange)}
-.promo{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:28px 5%;border:1px solid #3c2618;border-radius:18px;background:linear-gradient(110deg,#25150c,#111 65%);margin:45px 0}
-.promo h2{margin:0 0 6px;font-size:22px}.promo p{margin:0;color:var(--muted);font-size:12px}
-footer{border-top:1px solid var(--line);padding:35px 4% 100px;color:var(--muted);font-size:12px}
-.footer-inner{max-width:1400px;margin:auto;display:flex;justify-content:space-between;gap:25px;flex-wrap:wrap}
-.footer-inner p{max-width:360px;line-height:1.8}
-.bottomnav{display:none}
-/* Popup */
-.modal{display:none;position:fixed;inset:0;z-index:20;background:#000c;backdrop-filter:blur(7px);padding:18px;overflow-y:auto}
-.modal.show{display:flex;align-items:center;justify-content:center}
-.dialog{width:min(720px,100%);max-height:94vh;overflow-y:auto;background:#101010;border:1px solid #383838;border-radius:20px;padding:23px;box-shadow:0 25px 100px #000}
-.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
-.dialog-head h2{margin:0;font-size:22px}
-.closebtn{width:38px;height:38px;border-radius:10px;background:#222;color:#fff;border:1px solid #444}
-.cartline{display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 0;border-bottom:1px solid #2b2b2b}
-.cartline b{font-size:13px}.cartline small{color:var(--muted)}
-.qty{display:flex;align-items:center;gap:9px;margin-top:7px}
-.qty button{width:27px;height:27px;border-radius:7px;background:#222;color:white;border:1px solid #444}
-.billrow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #2a2a2a;font-size:13px}
-.totalrow{font-size:19px;font-weight:800;color:var(--orange)}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:17px 0}
-.field label{display:block;font-size:11px;color:#aaa;margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:12px;background:#171717;color:white;border:1px solid #383838;border-radius:9px}
-.field textarea{resize:vertical}
-.full{grid-column:1/-1}
-.addressopts{display:flex;gap:9px;flex-wrap:wrap;margin:8px 0 12px}
-.addressopts label{border:1px solid #393939;padding:10px 12px;border-radius:9px;font-size:12px}
-.paychoice{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid #ff75185c;background:#ff751810;border-radius:10px;font-size:13px}
-.paychoice input{accent-color:var(--orange)}
-.note{font-size:11px;color:var(--muted);line-height:1.6}
-.bill{background:#171717;border:1px dashed #666;padding:17px;border-radius:12px;margin-top:15px}
-.bill h3{color:var(--orange);margin:0 0 8px}
-.popup-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
-.close-bottom{width:100%;padding:12px;background:#222;color:white;border:1px solid #444;border-radius:10px;margin-top:17px}
-.toast{position:fixed;z-index:50;left:50%;bottom:90px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#f5f5f5;color:#111;border-radius:10px;padding:12px 18px;font-size:12px;font-weight:700;transition:.25s;box-shadow:0 8px 30px #0007}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:1050px){.product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.filters{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{padding:38px 5%}}
-@media(max-width:700px){
- .topbar{font-size:10px}.nav{padding:12px 4%;gap:10px;flex-wrap:wrap}
- .logo{font-size:23px}.search{order:3;flex-basis:100%;padding:0 11px}.nav .cartbtn{margin-left:auto}
- .container{width:92%}.hero{grid-template-columns:1fr;min-height:auto;padding:30px 7%;margin-top:18px}
- .hero h1{font-size:42px}.hero-art{min-height:200px}.hero-art img{height:225px;width:100%}
- .float-tag{font-size:10px}.tag-one{top:10px;right:0}.tag-two{bottom:10px;left:0}
- .benefits{gap:8px}.benefit{padding:10px;display:block}.benefit .ico{margin-bottom:8px;width:35px;height:35px}.benefit b{font-size:11px}.benefit small{font-size:10px}
- .section{margin:28px 0}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- .product-img img{height:135px}.product-body{padding:10px}.product h3{font-size:12px}.product-desc{font-size:10px;min-height:32px}.price{font-size:16px}.add{padding:7px 9px;font-size:11px}
- .filters{grid-template-columns:1fr 1fr;gap:8px}.pricebox{min-height:42px}.promo{padding:20px;align-items:start}.promo h2{font-size:18px}
- .bottomnav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:10;background:#0d0d0df5;backdrop-filter:blur(15px);border-top:1px solid #303030;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
- .bottomnav button{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:#999;font-size:9px;min-width:48px}
- .bottomnav button svg{width:20px;height:20px}.bottomnav button.active{color:var(--orange)}
- footer{padding-bottom:95px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.dialog{padding:16px}.modal{padding:9px}
-}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CraveCart | Premium Vegetarian Food Delivery</title>
+
+    <meta name="description"
+          content="Discover delicious vegetarian food with CraveCart. Fresh cravings, delivered with love.">
+
+    <meta name="theme-color" content="#000000">
+
+    <meta property="og:title" content="CraveCart - Fresh Cravings">
+    <meta property="og:description"
+          content="Your favourite vegetarian food, delivered fresh.">
+
+    <link rel="icon"
+          type="image/png"
+          href="https://i.postimg.cc/HkrL3C15/Crave-Cart-Glowing-Food-Delivery-Logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="app.js" defer></script>
 </head>
+
 <body>
-<div class="topbar">✦ Fresh vegetarian food · Delicious deals · Made for your cravings</div>
-<header>
-  <div class="nav">
-    <a href="#" class="logo">Crave<span>Cart.</span></a>
-    <label class="search">
-      <i data-lucide="search"></i>
-      <input id="search" placeholder="Search pizza, paneer, dosa..." oninput="renderProducts()">
-      <kbd style="color:#888;font-size:10px">⌕</kbd>
-    </label>
-    <button class="iconbtn" onclick="showFavourites()"><i data-lucide="heart"></i><span class="desktop-text">Saved</span></button>
-    <button class="iconbtn cartbtn" onclick="openCart()"><i data-lucide="shopping-bag"></i> Cart <span class="count" id="cartCount">0</span></button>
-  </div>
-</header>
 
-<main class="container" id="home">
-  <section class="hero">
-    <div class="hero-copy">
-      <span class="eyebrow"><i data-lucide="sparkles" style="width:15px"></i> GOOD FOOD, GOOD MOOD</span>
-      <h1>Big cravings.<br><span>Better bites.</span></h1>
-      <p>From cheesy pizzas to spicy paneer and sweet treats — discover vegetarian favourites made to brighten your day.</p>
-      <button class="primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Explore Menu <i data-lucide="arrow-up-right"></i></button>
+    <!-- ANNOUNCEMENT BAR -->
+    <div class="announcement-bar">
+        <p>
+            <span class="announcement-dot"></span>
+            Fresh vegetarian cravings, delivered with love.
+        </p>
     </div>
-    <div class="hero-art">
-      <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=850&q=85" alt="Freshly baked vegetarian pizza">
-      <div class="float-tag tag-one"><b>100+ choices</b>All vegetarian</div>
-      <div class="float-tag tag-two"><b>Made with love</b>For every craving</div>
+
+    <!-- NAVIGATION -->
+    <header class="site-header">
+
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="#home" class="brand" aria-label="CraveCart home">
+                <span class="brand-icon">C</span>
+
+                <span class="brand-text">
+                    Crave<span>Cart</span>
+                    <small>FRESH CRAVINGS. DELIVERED WITH LOVE.</small>
+                </span>
+            </a>
+
+            <button
+                class="mobile-menu-toggle"
+                id="mobileMenuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navLinks">
+
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#categories" class="nav-link">Categories</a>
+                <a href="#menu" class="nav-link">Menu</a>
+                <a href="#offers" class="nav-link">Offers</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+
+            <div class="nav-actions">
+
+                <button
+                    class="icon-button"
+                    id="searchToggle"
+                    aria-label="Focus product search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 5 5"></path>
+                    </svg>
+                </button>
+
+                <button
+                    class="icon-button wishlist-nav"
+                    id="wishlistToggle"
+                    aria-label="Show favourites">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6l1.2 1.2L12 21l7.6-7.6 1.2-1.2a5.4 5.4 0 0 0 0-7.6Z"></path>
+                    </svg>
+
+                    <span class="count-badge" id="wishlistCount">0</span>
+                </button>
+
+                <button
+                    class="cart-button"
+                    id="cartToggle"
+                    aria-label="Open shopping cart">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3h2l2.4 11.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"></path>
+                        <circle cx="10" cy="20" r="1"></circle>
+                        <circle cx="18" cy="20" r="1"></circle>
+                    </svg>
+
+                    <span>Cart</span>
+                    <span class="count-badge" id="cartCount">0</span>
+                </button>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- HERO SECTION -->
+        <section class="hero-section" id="home">
+
+            <div class="hero-glow hero-glow-one"></div>
+            <div class="hero-glow hero-glow-two"></div>
+
+            <div class="container hero-grid">
+
+                <div class="hero-content">
+
+                    <span class="eyebrow">
+                        <span class="veg-symbol"></span>
+                        PURE VEGETARIAN · MADE FOR CRAVINGS
+                    </span>
+
+                    <h1>
+                        Your Favourite
+                        <span class="text-orange">Veg Food,</span>
+                        Delivered Fresh.
+                    </h1>
+
+                    <p class="hero-description">
+                        From cheesy pizzas to comforting Indian meals,
+                        discover vegetarian favourites made for your
+                        cravings and delivered with love.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="#menu" class="btn btn-primary">
+                            Explore Menu <span>→</span>
+                        </a>
+
+                        <a href="#offers" class="btn btn-secondary">
+                            Discover Offers
+                        </a>
+                    </div>
+
+                    <div class="hero-trust">
+
+                        <div class="trust-item">
+                            <span class="trust-icon">✓</span>
+                            <span>100% Vegetarian Menu</span>
+                        </div>
+
+                        <div class="trust-item">
+                            <span class="trust-icon">₹</span>
+                            <span>Transparent Pricing</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-visual">
+
+                    <div class="hero-image-frame">
+
+                        <img
+                            src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1100&q=85"
+                            alt="Fresh vegetarian pizza topped with vegetables"
+                            class="hero-image"
+                            fetchpriority="high">
+
+                        <div class="floating-card floating-card-top">
+                            <span class="floating-icon">✦</span>
+                            <div>
+                                <strong>Freshly Picked</strong>
+                                <small>Made for your cravings</small>
+                            </div>
+                        </div>
+
+                        <div class="floating-card floating-card-bottom">
+                            <span class="floating-icon">₹</span>
+                            <div>
+                                <strong>Free Delivery</strong>
+                                <small>On orders of ₹499+</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="hero-circle"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- BENEFITS STRIP -->
+        <section class="benefits-strip">
+            <div class="container benefits-grid">
+
+                <div class="benefit-item">
+                    <span class="benefit-icon">01</span>
+                    <div>
+                        <h3>Veg Only</h3>
+                        <p>A vegetarian-first menu</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <span class="benefit-icon">02</span>
+                    <div>
+                        <h3>Easy Ordering</h3>
+                        <p>Your favourites in a few clicks</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <span class="benefit-icon">03</span>
+                    <div>
+                        <h3>Clear Pricing</h3>
+                        <p>No hidden delivery surprises</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <span class="benefit-icon">04</span>
+                    <div>
+                        <h3>Made for You</h3>
+                        <p>Discover something delicious</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CATEGORIES -->
+        <section class="section container" id="categories">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-kicker">EXPLORE YOUR CRAVINGS</span>
+                    <h2>What are you <span class="text-orange">hungry for?</span></h2>
+                    <p>Find your next vegetarian favourite.</p>
+                </div>
+
+                <a href="#menu" class="text-link">
+                    Explore all food <span>→</span>
+                </a>
+
+            </div>
+
+            <div class="category-grid" id="categoryGrid">
+                <!-- Categories are rendered by app.js -->
+            </div>
+
+        </section>
+
+        <!-- PROMOTIONAL BANNER -->
+        <section class="promo-section container" id="offers">
+
+            <div class="promo-card">
+
+                <div class="promo-content">
+                    <span class="promo-label">A LITTLE EXTRA LOVE</span>
+
+                    <h2>
+                        Your cart deserves
+                        <span class="text-orange">free delivery.</span>
+                    </h2>
+
+                    <p>
+                        Add your favourite vegetarian treats.
+                        Orders of ₹499 or more qualify for free delivery.
+                    </p>
+
+                    <a href="#menu" class="btn btn-primary">
+                        Build Your Cart →
+                    </a>
+                </div>
+
+                <div class="promo-art" aria-hidden="true">
+                    <div class="promo-orbit"></div>
+                    <div class="promo-symbol">₹</div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- MENU -->
+        <section class="section menu-section" id="menu">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-kicker">THE GOOD STUFF</span>
+                        <h2>Made to <span class="text-orange">crave.</span></h2>
+                        <p>Explore our vegetarian food collection.</p>
+                    </div>
+
+                    <span class="product-count" id="productCount">
+                        Loading menu...
+                    </span>
+
+                </div>
+
+                <!-- SEARCH AND FILTERS -->
+                <div class="filter-panel">
+
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                            <path d="m16 16 5 5"></path>
+                        </svg>
+
+                        <input
+                            type="search"
+                            id="productSearch"
+                            placeholder="Search pizza, paneer, burgers..."
+                            aria-label="Search vegetarian products">
+                    </div>
+
+                    <select id="sortProducts" aria-label="Sort products">
+                        <option value="popular">Most Popular</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+
+                    <select id="priceFilter" aria-label="Filter by price">
+                        <option value="all">All Prices</option>
+                        <option value="under150">Under ₹150</option>
+                        <option value="150-300">₹150 – ₹300</option>
+                        <option value="above300">Above ₹300</option>
+                    </select>
+
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="bestsellerFilter">
+                        <span>Bestsellers</span>
+                    </label>
+
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="discountFilter">
+                        <span>On Offer</span>
+                    </label>
+
+                    <button class="clear-filters" id="clearFilters">
+                        Clear Filters
+                    </button>
+
+                </div>
+
+                <div class="active-filters" id="activeFilters"></div>
+
+                <!-- PRODUCT GRID -->
+                <div
+                    class="product-grid"
+                    id="productGrid"
+                    aria-live="polite">
+
+                    <!-- Products are rendered by app.js -->
+
+                </div>
+
+                <div class="empty-state hidden" id="emptyProducts">
+                    <div class="empty-state-icon">⌕</div>
+                    <h3>No cravings found</h3>
+                    <p>Try another search or clear your filters.</p>
+
+                    <button class="btn btn-primary" id="emptyClearFilters">
+                        Show All Products
+                    </button>
+                </div>
+
+                <div class="load-more-wrap">
+                    <button class="btn btn-secondary" id="loadMore">
+                        Load More Deliciousness
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- WHY CRAVECART -->
+        <section class="section why-section" id="about">
+
+            <div class="container">
+
+                <div class="section-heading centered-heading">
+                    <span class="section-kicker">THE CRAVECART DIFFERENCE</span>
+
+                    <h2>
+                        Good food.
+                        <span class="text-orange">Good feelings.</span>
+                    </h2>
+
+                    <p>
+                        A simple, thoughtful way to explore vegetarian favourites.
+                    </p>
+                </div>
+
+                <div class="why-grid">
+
+                    <article class="why-card">
+                        <span class="why-number">01</span>
+                        <h3>Vegetarian by Choice</h3>
+                        <p>
+                            Explore a menu designed around vegetarian
+                            meals, snacks and drinks.
+                        </p>
+                    </article>
+
+                    <article class="why-card">
+                        <span class="why-number">02</span>
+                        <h3>Pricing You Understand</h3>
+                        <p>
+                            See item prices, delivery charges and your
+                            order total before checkout.
+                        </p>
+                    </article>
+
+                    <article class="why-card">
+                        <span class="why-number">03</span>
+                        <h3>Your Favourites, Saved</h3>
+                        <p>
+                            Keep track of favourite dishes and build
+                            your cart at your own pace.
+                        </p>
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- CONTACT -->
+        <section class="section contact-section container" id="contact">
+
+            <div class="contact-card">
+
+                <div>
+                    <span class="section-kicker">WE'RE HERE TO HELP</span>
+
+                    <h2>Let's talk <span class="text-orange">food.</span></h2>
+
+                    <p>
+                        Customer support contact details can be configured
+                        before the website goes live.
+                    </p>
+                </div>
+
+                <a href="mailto:hello@example.com" class="btn btn-primary">
+                    Contact Support →
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+
+        <div class="container footer-grid">
+
+            <div class="footer-brand">
+
+                <a href="#home" class="brand">
+                    <span class="brand-icon">C</span>
+
+                    <span class="brand-text">
+                        Crave<span>Cart</span>
+                        <small>FRESH CRAVINGS. DELIVERED WITH LOVE.</small>
+                    </span>
+                </a>
+
+                <p>
+                    Your vegetarian cravings deserve something special.
+                    Discover your next favourite with CraveCart.
+                </p>
+
+            </div>
+
+            <div class="footer-column">
+                <h3>Explore</h3>
+                <a href="#home">Home</a>
+                <a href="#categories">Categories</a>
+                <a href="#menu">Menu</a>
+                <a href="#offers">Offers</a>
+            </div>
+
+            <div class="footer-column">
+                <h3>Information</h3>
+                <a href="#about">About Us</a>
+                <a href="#contact">Contact</a>
+                <a href="#privacy" data-policy="privacy">Privacy Policy</a>
+                <a href="#terms" data-policy="terms">Terms & Conditions</a>
+            </div>
+
+            <div class="footer-column">
+                <h3>Customer Care</h3>
+                <a href="#refund" data-policy="refund">Refund Policy</a>
+                <a href="#delivery" data-policy="delivery">Delivery Policy</a>
+                <p class="footer-note">
+                    Support email must be configured by the site owner.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span> CraveCart.
+                All rights reserved.
+            </p>
+
+            <p>Fresh Cravings. Delivered with Love.</p>
+        </div>
+
+    </footer>
+
+    <!-- CART DRAWER BACKDROP -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+    <!-- SHOPPING CART DRAWER -->
+    <aside
+        class="cart-drawer"
+        id="cartDrawer"
+        aria-label="Shopping cart"
+        aria-hidden="true"
+        inert>
+
+        <div class="drawer-header">
+            <div>
+                <span class="section-kicker">YOUR SELECTION</span>
+                <h2>Your Cart <span id="drawerItemCount">(0)</span></h2>
+            </div>
+
+            <button class="close-button" id="closeCart" aria-label="Close cart">
+                &times;
+            </button>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items are rendered by app.js -->
+        </div>
+
+        <div class="cart-empty" id="cartEmpty">
+            <div class="empty-state-icon">♡</div>
+            <h3>Your cart is waiting</h3>
+            <p>Add something delicious to get started.</p>
+
+            <button class="btn btn-primary" id="exploreFromCart">
+                Explore Menu
+            </button>
+        </div>
+
+        <div class="cart-summary" id="cartSummary">
+
+            <div class="delivery-progress">
+                <p id="deliveryMessage">
+                    Add items to unlock free delivery.
+                </p>
+
+                <div class="progress-track">
+                    <div class="progress-fill" id="deliveryProgress"></div>
+                </div>
+            </div>
+
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <span id="cartSubtotal">₹0</span>
+            </div>
+
+            <div class="summary-line">
+                <span>Delivery fee</span>
+                <span id="cartDelivery">₹0</span>
+            </div>
+
+            <div class="summary-line summary-total">
+                <span>Total</span>
+                <span id="cartTotal">₹0</span>
+            </div>
+
+            <p class="demo-notice">
+                Demo checkout only. No real order will be sent.
+            </p>
+
+            <button class="btn btn-primary checkout-button" id="checkoutButton">
+                Proceed to Checkout →
+            </button>
+
+            <button class="text-button" id="clearCartButton">
+                Clear Cart
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- GENERAL MODAL -->
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+
+        <section
+            class="modal-panel"
+            id="modalPanel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle">
+
+            <button
+                class="close-button modal-close"
+                id="closeModal"
+                aria-label="Close dialog">
+                &times;
+            </button>
+
+            <div id="modalContent"></div>
+
+        </section>
+
     </div>
-  </section>
 
-  <section class="benefits">
-    <div class="benefit"><div class="ico"><i data-lucide="leaf"></i></div><div><b>100% Vegetarian</b><small>Veg-only food menu</small></div></div>
-    <div class="benefit"><div class="ico"><i data-lucide="wallet"></i></div><div><b>Cash on Delivery</b><small>Pay when it arrives</small></div></div>
-    <div class="benefit"><div class="ico"><i data-lucide="badge-percent"></i></div><div><b>Free Delivery</b><small>Orders of ₹499 or more</small></div></div>
-  </section>
-
-  <section class="section" id="menu">
-    <div class="section-head">
-      <div><h2>Find your favourite</h2><p>Good food is just a few clicks away.</p></div>
-      <span class="results" id="resultCount">100 items</span>
+    <!-- TOAST NOTIFICATIONS -->
+    <div
+        class="toast-container"
+        id="toastContainer"
+        aria-live="polite"
+        aria-atomic="true">
     </div>
-    <div class="categories" id="categories"></div>
-    <div class="filters">
-      <select class="control" id="sort" onchange="renderProducts()">
-        <option value="featured">✦ Recommended</option>
-        <option value="low">Price: Low to High</option>
-        <option value="high">Price: High to Low</option>
-        <option value="az">Name: A to Z</option>
-        <option value="rating">Top Rated</option>
-      </select>
-      <select class="control" id="priceFilter" onchange="renderProducts()">
-        <option value="all">Any Price</option>
-        <option value="100">Under ₹100</option>
-        <option value="200">Under ₹200</option>
-        <option value="300">Under ₹300</option>
-        <option value="500">Under ₹500</option>
-      </select>
-      <select class="control" id="ratingFilter" onchange="renderProducts()">
-        <option value="0">All Ratings</option>
-        <option value="4.5">4.5+ stars</option>
-        <option value="4.0">4.0+ stars</option>
-      </select>
-      <div class="pricebox"><span>₹0</span><input id="maxPrice" type="range" min="50" max="600" step="25" value="600" oninput="document.getElementById('maxLabel').textContent='₹'+this.value;renderProducts()"><b id="maxLabel">₹600</b></div>
-      <button class="iconbtn" onclick="clearFilters()"><i data-lucide="rotate-ccw"></i> Reset</button>
-    </div>
-    <div class="product-grid" id="products"></div>
-  </section>
 
-  <section class="promo">
-    <div><h2>Good food. Great mood. 🧡</h2><p>Add your favourites and enjoy free delivery on orders of ₹499 or more.</p></div>
-    <button class="primary" onclick="openCart()">View My Cart <i data-lucide="arrow-right"></i></button>
-  </section>
-</main>
+    <!-- BACK TO TOP -->
+    <button
+        class="back-to-top"
+        id="backToTop"
+        aria-label="Back to top">
+        ↑
+    </button>
 
-<footer>
-  <div class="footer-inner">
-    <div><div class="logo">Crave<span>Cart.</span></div><p>Bringing delicious vegetarian favourites to your table. A demo food ordering experience made with care.</p></div>
-    <div><b style="color:white">Quick Links</b><p><a href="#home">Home</a> · <a href="#menu">Menu</a> · <a href="#" onclick="showOrders();return false">My Orders</a></p></div>
-    <div><b style="color:white">Payment</b><p>Cash on Delivery available<br>Demo store · No online payment</p></div>
-  </div>
-</footer>
-
-<nav class="bottomnav">
-  <button class="active" onclick="goHome(this)"><i data-lucide="house"></i>Home</button>
-  <button onclick="goMenu(this)"><i data-lucide="search"></i>Explore</button>
-  <button onclick="showOrders()"><i data-lucide="package-check"></i>Orders</button>
-  <button onclick="showFavourites()"><i data-lucide="heart"></i>Saved</button>
-  <button onclick="openCart()"><i data-lucide="shopping-bag"></i>Cart <span id="mobileCount">0</span></button>
-</nav>
-
-<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
-  <div class="dialog">
-    <div class="dialog-head"><h2 id="modalTitle">Your Cart</h2><button class="closebtn" onclick="closeModal()" aria-label="Close popup"><i data-lucide="x"></i></button></div>
-    <div id="modalContent"></div>
-    <button class="close-bottom" onclick="closeModal()">Close Popup</button>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-
-<script>
-const groups={
-"Pizza":["Margherita Pizza","Farmhouse Pizza","Paneer Tikka Pizza","Corn Cheese Pizza","Veggie Supreme","Onion Capsicum Pizza","Cheese Burst Pizza","Mushroom Pizza","Peri Peri Pizza","Tandoori Paneer Pizza"],
-"Burger":["Classic Veg Burger","Aloo Tikki Burger","Paneer Burger","Crispy Veg Burger","Cheese Burger","Double Patty Burger","Mexican Veg Burger","Mushroom Burger","Spicy Bean Burger","Corn Cheese Burger"],
-"Indian":["Paneer Butter Masala","Shahi Paneer","Kadai Paneer","Palak Paneer","Chole Masala","Dal Makhani","Mix Veg Curry","Malai Kofta","Aloo Gobi","Rajma Masala"],
-"Rice & Biryani":["Veg Biryani","Paneer Biryani","Jeera Rice","Veg Fried Rice","Schezwan Rice","Lemon Rice","Curd Rice","Peas Pulao","Mushroom Biryani","Tawa Pulao"],
-"South Indian":["Masala Dosa","Plain Dosa","Mysore Masala Dosa","Rava Dosa","Idli Sambar","Medu Vada","Uttapam","Onion Uttapam","Paneer Dosa","Cheese Dosa"],
-"Chinese":["Veg Hakka Noodles","Schezwan Noodles","Chilli Paneer","Veg Manchurian","Crispy Corn","Spring Rolls","Chilli Potato","Honey Chilli Potato","Veg Momos","Paneer Momos"],
-"Sandwich & Wrap":["Veg Grilled Sandwich","Cheese Sandwich","Paneer Sandwich","Corn Sandwich","Aloo Wrap","Paneer Tikka Wrap","Mexican Wrap","Club Veg Sandwich","Mushroom Sandwich","Cheese Toast"],
-"Snacks":["French Fries","Peri Peri Fries","Cheese Balls","Veg Cutlet","Samosa (2 pcs)","Paneer Pakora","Onion Rings","Garlic Bread","Cheese Garlic Bread","Masala Maggi"],
-"Desserts":["Gulab Jamun","Rasgulla","Chocolate Brownie","Chocolate Cake","Vanilla Ice Cream","Chocolate Ice Cream","Kulfi","Rasmalai","Cheesecake","Choco Lava Cake"],
-"Drinks":["Masala Chai","Cold Coffee","Mango Shake","Chocolate Shake","Fresh Lime Soda","Sweet Lassi","Mango Lassi","Iced Tea","Hot Coffee","Mineral Water"]
-};
-const basePrice={"Pizza":150,"Burger":80,"Indian":160,"Rice & Biryani":130,"South Indian":70,"Chinese":100,"Sandwich & Wrap":75,"Snacks":50,"Desserts":60,"Drinks":30};
-const photos=[
-"photo-1513104890138-7c749659a591","photo-1568901346375-23c9450c58cd",
-"photo-1546069901-ba9599a7e63c","photo-1540189549336-e6e99c3679fe",
-"photo-1565299624946-b28f40a0ae38","photo-1512621776951-a57141f2eefd",
-"photo-1547592180-85f173990554","photo-1473093295043-cdd812d0e601",
-"photo-1540914124281-342587941389","photo-1504674900247-0877df9cc836"
-];
-const descriptions={
-"Pizza":"Freshly baked, loaded with delicious toppings.",
-"Burger":"A satisfying vegetarian burger made fresh.",
-"Indian":"Comforting Indian flavours and spices.",
-"Rice & Biryani":"Aromatic rice with flavourful spices.",
-"South Indian":"A classic South Indian favourite.",
-"Chinese":"Tasty Indo-Chinese vegetarian flavours.",
-"Sandwich & Wrap":"Fresh, filling and full of flavour.",
-"Snacks":"The perfect bite for any time.",
-"Desserts":"A sweet little treat to brighten your day.",
-"Drinks":"A refreshing sip for your cravings."
-};
-const products=[];
-let id=1;
-Object.entries(groups).forEach(([category,names],g)=>{
- names.forEach((name,i)=>products.push({
-  id:id++,name,category,price:basePrice[category]+(i*17%90),
-  description:descriptions[category],rating:(4.1+((i+g)%9)/10),
-  image:photos[(g+i)%photos.length],featured:i<2
- }));
-});
-
-let cart=readStore("cc-cart",[]);
-let favourites=readStore("cc-favourites",[]);
-let selectedCategory="";
-let orderHistory=readStore("cc-orders",[]);
-let lastOrder=null;
-let modalMode="cart";
-
-function readStore(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch(e){return fallback}}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function imgURL(p){return "https://images.unsplash.com/"+p.image+"?auto=format&fit=crop&w=650&q=78"}
-function refreshIcons(){if(window.lucide)lucide.createIcons()}
-function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove("show"),2200)}
-
-function buildCategories(){
- const icons={"All":"layout-grid","Pizza":"pizza","Burger":"sandwich","Indian":"cooking-pot","Rice & Biryani":"utensils","South Indian":"soup","Chinese":"flame","Sandwich & Wrap":"sandwich","Snacks":"croissant","Desserts":"cake-slice","Drinks":"coffee"};
- document.getElementById("categories").innerHTML=
- [["All","All"],...Object.keys(groups).map(c=>[c,c])].map(([c,label])=>
- `<button class="chip ${c==="All"?"active":""}" onclick="setCategory('${esc(c)}',this)"><i data-lucide="${icons[c]||"utensils"}"></i>${label}</button>`
- ).join("");
- refreshIcons();
-}
-function setCategory(c,btn){
- selectedCategory=c==="All"?"":c;
- document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
- btn.classList.add("active");
- renderProducts();
-}
-function renderProducts(){
- const q=document.getElementById("search").value.toLowerCase().trim();
- const maxPrice=Number(document.getElementById("maxPrice").value);
- const priceFilter=document.getElementById("priceFilter").value;
- const rating=Number(document.getElementById("ratingFilter").value);
- let list=products.filter(p=>
-  (!selectedCategory||p.category===selectedCategory)&&
-  (p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)||p.description.toLowerCase().includes(q))&&
-  p.price<=maxPrice&&(priceFilter==="all"||p.price<Number(priceFilter))&&p.rating>=rating
- );
- const sort=document.getElementById("sort").value;
- if(sort==="low")list.sort((a,b)=>a.price-b.price);
- if(sort==="high")list.sort((a,b)=>b.price-a.price);
- if(sort==="az")list.sort((a,b)=>a.name.localeCompare(b.name));
- if(sort==="rating")list.sort((a,b)=>b.rating-a.rating);
- if(sort==="featured")list.sort((a,b)=>Number(b.featured)-Number(a.featured));
- document.getElementById("resultCount").textContent=`${list.length} items`;
- document.getElementById("products").innerHTML=list.length?list.map(p=>{
-  const fav=favourites.includes(p.id);
-  return `<article class="product">
-   <div class="product-img">
-    <img src="${imgURL(p)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.opacity='.2'">
-    <span class="vegmark" title="Vegetarian"></span>
-    ${p.featured?'<span class="badge">POPULAR</span>':""}
-    <button class="fav ${fav?"active":""}" onclick="toggleFav(${p.id})" aria-label="Save ${esc(p.name)}"><i data-lucide="${fav?"heart":"heart"}" ${fav?'fill="#ff5267"':''}></i></button>
-   </div>
-   <div class="product-body">
-    <div class="product-top"><h3>${esc(p.name)}</h3><span class="rating">★ ${p.rating.toFixed(1)}</span></div>
-    <p class="product-desc">${esc(p.description)}</p>
-    <div class="product-bottom"><span class="price">₹${p.price}</span>
-     <button class="add" onclick="addToCart(${p.id})"><i data-lucide="plus"></i> Add</button></div>
-   </div>
-  </article>`;
- }).join(""):`<div class="empty"><i data-lucide="search-x"></i><h3>No food found</h3><p>Try changing your search or filters.</p><button class="primary" onclick="clearFilters()">Clear filters</button></div>`;
- refreshIcons();
-}
-function clearFilters(){
- document.getElementById("search").value="";
- document.getElementById("sort").value="featured";
- document.getElementById("priceFilter").value="all";
- document.getElementById("ratingFilter").value="0";
- document.getElementById("maxPrice").value=600;
- document.getElementById("maxLabel").textContent="₹600";
- selectedCategory="";
- buildCategories();renderProducts();
-}
-function toggleFav(id){
- favourites=favourites.includes(id)?favourites.filter(x=>x!==id):[...favourites,id];
- localStorage.setItem("cc-favourites",JSON.stringify(favourites));
- renderProducts();
- toast(favourites.includes(id)?"Added to saved items":"Removed from saved items");
-}
-function showFavourites(){
- const list=products.filter(p=>favourites.includes(p.id));
- showProductList("Saved Favourites",list);
-}
-function showProductList(title,list){
- modalMode="list";
- document.getElementById("modalTitle").textContent=title;
- document.getElementById("modalContent").innerHTML=list.length?list.map(p=>
- `<div class="cartline"><div><b>${esc(p.name)}</b><br><small>${esc(p.category)}</small></div><div><b>₹${p.price}</b><br><button class="linkbtn" onclick="addToCart(${p.id})">+ Add</button></div></div>`
- ).join(""):`<p class="note">Nothing here yet. Save a favourite from the menu.</p>`;
- openModal();
-}
-function addToCart(id){
- const item=cart.find(x=>x.id===id);
- if(item)item.qty++;else cart.push({id,qty:1});
- saveCart();toast("Added to cart");
-}
-function changeQty(id,n){
- const item=cart.find(x=>x.id===id);if(!item)return;
- item.qty+=n;if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
- saveCart();renderCart();
-}
-function saveCart(){localStorage.setItem("cc-cart",JSON.stringify(cart));updateCart()}
-function details(){return cart.map(x=>{const p=products.find(y=>y.id===x.id);return p?{...p,qty:x.qty}:null}).filter(Boolean)}
-function subtotal(){return details().reduce((s,p)=>s+p.price*p.qty,0)}
-function delivery(){return subtotal()===0||subtotal()>=499?0:40}
-function total(){return subtotal()+delivery()}
-function updateCart(){
- const count=cart.reduce((s,x)=>s+x.qty,0);
- document.getElementById("cartCount").textContent=count;
- document.getElementById("mobileCount").textContent=count;
-}
-function openModal(){document.getElementById("modal").classList.add("show");document.body.style.overflow="hidden";refreshIcons()}
-function closeModal(){document.getElementById("modal").classList.remove("show");document.body.style.overflow=""}
-function openCart(){
- modalMode="cart";document.getElementById("modalTitle").textContent="Your Cart";
- document.getElementById("modalContent").innerHTML=cartMarkup();
- openModal();
-}
-function cartMarkup(){
- const list=details();
- return (list.length?list.map(p=>`<div class="cartline">
-  <div><b>${esc(p.name)}</b><br><small>₹${p.price} each</small>
-   <div class="qty"><button onclick="changeQty(${p.id},-1)">−</button><span>${p.qty}</span><button onclick="changeQty(${p.id},1)">+</button></div>
-  </div><b>₹${p.price*p.qty}</b></div>`).join("")+
-  `<div style="margin-top:12px"><div class="billrow"><span>Subtotal</span><b>₹${subtotal()}</b></div><div class="billrow"><span>Delivery</span><b>${delivery()?"₹"+delivery():"FREE"}</b></div><div class="billrow totalrow"><span>Total</span><span>₹${total()}</span></div></div>
-  <p class="note">${subtotal()<499?"Add ₹"+(499-subtotal())+" more for free delivery.":"You unlocked free delivery!"}</p>
-  <button class="primary" style="width:100%;margin-top:12px" onclick="checkout()">Continue to Checkout <i data-lucide="arrow-right"></i></button>`
-  :`<div class="empty"><i data-lucide="shopping-bag"></i><h3>Your cart is empty</h3><p>Add your favourite vegetarian food to get started.</p></div>`);
-}
-function renderCart(){if(modalMode==="cart"&&document.getElementById("modal").classList.contains("show")){document.getElementById("modalContent").innerHTML=cartMarkup();refreshIcons()}}
-const oldSaveCart=saveCart;
-saveCart=function(){oldSaveCart();renderCart()};
-
-function checkout(){
- if(!cart.length)return toast("Your cart is empty");
- modalMode="checkout";
- const saved=localStorage.getItem("cc-address")||"";
- document.getElementById("modalTitle").textContent="Checkout";
- document.getElementById("modalContent").innerHTML=`
-  <div id="checkoutItems">${details().map(p=>`<div class="billrow"><span>${esc(p.name)} × ${p.qty}</span><b>₹${p.price*p.qty}</b></div>`).join("")}
-  <div class="billrow"><span>Subtotal</span><b>₹${subtotal()}</b></div>
-  <div class="billrow"><span>Delivery</span><b>${delivery()?"₹"+delivery():"FREE"}</b></div>
-  <div class="billrow totalrow"><span>Total</span><span>₹${total()}</span></div></div>
-  <form id="checkoutForm" onsubmit="placeOrder(event)">
-   <div class="formgrid">
-    <div class="field"><label for="custName">Full Name</label><input id="custName" required maxlength="80" placeholder="Your full name"></div>
-    <div class="field"><label for="custPhone">Mobile Number</label><input id="custPhone" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile"></div>
-    <div class="field full"><label>Delivery Address</label>
-     <div class="addressopts">
-      <label><input type="radio" name="addrMode" value="same" ${saved?"checked":"disabled"} onchange="addressChanged()"> Same Address</label>
-      <label><input type="radio" name="addrMode" value="new" ${saved?"":"checked"} onchange="addressChanged()"> New Address</label>
-     </div>
-     <textarea id="custAddress" rows="3" required minlength="8" maxlength="300" placeholder="House no., street, area, city, PIN code">${esc(saved)}</textarea>
-     <p class="note">${saved?"Your last address is saved in this browser.":"Your address can be saved for your next order."}</p>
-    </div>
-    <div class="field full"><label>Payment Method</label><div class="paychoice"><input type="radio" checked disabled><i data-lucide="banknote"></i><span><b>Cash on Delivery</b><br><small class="note">Pay in cash when your order arrives.</small></span></div></div>
-   </div>
-   <button class="primary" type="submit" style="width:100%">Place Order · ₹${total()} <i data-lucide="check-circle"></i></button>
-  </form>`;
- openModal();refreshIcons();
-}
-function addressChanged(){
- const mode=document.querySelector('input[name="addrMode"]:checked')?.value;
- const saved=localStorage.getItem("cc-address")||"";
- const field=document.getElementById("custAddress");
- if(mode==="same"&&saved){field.value=saved;field.readOnly=true}
- else{field.readOnly=false;field.value="";field.focus()}
-}
-function placeOrder(event){
- event.preventDefault();
- const name=document.getElementById("custName").value.trim();
- const phone=document.getElementById("custPhone").value.trim();
- const address=document.getElementById("custAddress").value.trim();
- if(!/^[0-9]{10}$/.test(phone))return toast("Enter a valid 10-digit mobile number");
- if(address.length<8)return toast("Enter your complete delivery address");
- const order={
-  id:"CC"+Date.now().toString().slice(-8),date:new Date().toLocaleString(),
-  name,phone,address,payment:"Cash on Delivery",status:"Order Placed",
-  items:details().map(p=>({id:p.id,name:p.name,price:p.price,qty:p.qty})),
-  subtotal:subtotal(),delivery:delivery(),total:total()
- };
- localStorage.setItem("cc-address",address);
- const orders=readStore("cc-orders",[]);
- orders.unshift(order);localStorage.setItem("cc-orders",JSON.stringify(orders));
- lastOrder=order;cart=[];saveCart();
- document.getElementById("modalTitle").textContent="Order Confirmed!";
- document.getElementById("modalContent").innerHTML=billMarkup(order);
- modalMode="bill";refreshIcons();toast("Your demo order was placed!");
-}
-function billMarkup(o){
- return `<div style="text-align:center;padding:10px"><div style="color:#69d889"><i data-lucide="circle-check" style="width:42px;height:42px"></i></div><h3>Thank you, ${esc(o.name)}!</h3><p class="note">Your demo order has been placed.</p></div>
- <div class="bill" id="billPrint"><h3>CraveCart.</h3><p class="note">DEMO RECEIPT — NOT A TAX INVOICE</p>
- <div class="billrow"><span>Order ID</span><b>${esc(o.id)}</b></div><div class="billrow"><span>Date</span><span>${esc(o.date)}</span></div>
- <div class="billrow"><span>Customer</span><span>${esc(o.name)}</span></div><div class="billrow"><span>Mobile</span><span>${esc(o.phone)}</span></div>
- <div class="billrow"><span>Address</span><span>${esc(o.address)}</span></div>
- ${o.items.map(p=>`<div class="billrow"><span>${esc(p.name)} × ${p.qty}</span><b>₹${p.price*p.qty}</b></div>`).join("")}
- <div class="billrow"><span>Subtotal</span><b>₹${o.subtotal}</b></div><div class="billrow"><span>Delivery</span><b>${o.delivery?"₹"+o.delivery:"FREE"}</b></div>
- <div class="billrow"><span>Payment</span><b>Cash on Delivery</b></div><div class="billrow totalrow"><span>Grand Total</span><span>₹${o.total}</span></div></div>
- <div class="popup-actions"><button class="primary" onclick="downloadBill()"><i data-lucide="download"></i> Save / Download PDF</button><button class="iconbtn" onclick="printBill()"><i data-lucide="printer"></i> Print</button><button class="iconbtn" onclick="showOrders()"><i data-lucide="package"></i> My Orders</button></div>`;
-}
-function downloadBill(){printBill()}
-function printBill(){
- const bill=document.getElementById("billPrint");if(!bill)return;
- const w=window.open("","_blank");if(!w)return alert("Please allow popups to save your bill.");
- w.document.write(`<!doctype html><html><head><title>CraveCart Bill</title><style>body{font-family:Arial;padding:25px;color:#111;max-width:700px;margin:auto}.billrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #ddd}.totalrow{font-size:20px;color:#d65a00}h3{color:#e7650d}.note{color:#666;font-size:12px}</style></head><body>${bill.outerHTML}</body></html>`);
- w.document.close();w.focus();w.print();
-}
-function showOrders(){
- orderHistory=readStore("cc-orders",[]);
- modalMode="orders";document.getElementById("modalTitle").textContent="My Orders";
- document.getElementById("modalContent").innerHTML=orderHistory.length?orderHistory.slice(0,30).map(o=>
- `<div class="cartline"><div><b>${esc(o.id)}</b><br><small>${esc(o.date)} · ${esc(o.status||"Order Placed")}</small><br><small>${(o.items||[]).length} item types · ${esc(o.payment||"Cash on Delivery")}</small></div><div><b>₹${Number(o.total)||0}</b><br><button class="linkbtn" onclick="viewOrder('${esc(o.id)}')">View Bill</button></div></div>`
- ).join(""):`<div class="empty"><i data-lucide="package-search"></i><h3>No orders yet</h3><p>Your orders will appear here after checkout.</p></div>`;
- openModal();refreshIcons();
-}
-function viewOrder(id){
- const o=readStore("cc-orders",[]).find(x=>x.id===id);if(!o)return toast("Order not found");
- lastOrder=o;document.getElementById("modalTitle").textContent="Order Bill";
- document.getElementById("modalContent").innerHTML=billMarkup(o);modalMode="bill";refreshIcons();
-}
-function goHome(btn){document.getElementById("home").scrollIntoView({behavior:"smooth"});setActive(btn)}
-function goMenu(btn){document.getElementById("menu").scrollIntoView({behavior:"smooth"});setActive(btn)}
-function setActive(btn){document.querySelectorAll(".bottomnav button").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active")}
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
-buildCategories();renderProducts();updateCart();refreshIcons();
-</script>
 </body>
 </html>
